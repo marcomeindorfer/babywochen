@@ -682,7 +682,15 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.0";
+const VERSION="1.1";
+
+/* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
+   Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+let installAngebot=null;
+const alsApp=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: minimal-ui)").matches||navigator.standalone===true;
+addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installAngebot=e; if(state.tab==="mehr") render(); });
+addEventListener("appinstalled",()=>{ installAngebot=null; if(state.tab==="mehr") render(); });
 
 /* Gemeinsamer Stand S: daten/et, daten/birth als {v,ts}; notizen/w<Woche> als {t,ts}.
    Jeder Eintrag trägt seinen Zeitstempel, beim Abgleich gewinnt pro Eintrag der jüngere.
@@ -962,6 +970,10 @@ function viewMehr(){
   const list=alleNotizen().sort((a,b)=>b[0]-a[0]);
   const topicsList=Object.entries(TOPICS).map(([k,v])=>`<button class="linkbtn" data-topic="${k}" style="display:block;margin:4px 0">${esc(v.t)}</button>`).join("");
   return `<section class="page-head"><h1>Mehr</h1><p>Eure Daten, alle Notizen, alle Themen und die Quellen.</p></section>
+  <div class="stack"><div class="card"><h3>Als App</h3>
+   <p class="small" style="margin:0">Läuft gerade: <b style="color:var(--ink)">${alsApp()?"als installierte App":"im Browser"}</b></p>
+   ${installAngebot?`<button class="btn" type="button" id="inst" style="margin-top:10px">Jetzt als App installieren</button>`
+    :alsApp()?"":`<p class="small">Chrome bietet hier gerade keine Installation an. Meist heißt das: Chrome hält die App schon für installiert. Dann in Chrome über ⋮ nach „App öffnen“ schauen.</p>`}</div></div>
   <form class="stack" id="f"><div class="card"><h3>Eure Daten</h3><div class="row">
    <label for="et">Errechneter Termin<input type="date" id="et" value="${state.et}" required></label>
    <label for="birth">Geburtsdatum<input type="date" id="birth" value="${state.birth}"></label></div>
@@ -1022,6 +1034,8 @@ function render(){
   }
   if(state.tab==="mehr"){
     statusZeigen();
+    const inst=document.getElementById("inst");
+    if(inst) inst.addEventListener("click",async()=>{ const e=installAngebot; if(!e) return; e.prompt(); try{ await e.userChoice; }catch(err){} installAngebot=null; render(); });
     document.getElementById("f").addEventListener("submit",e=>{e.preventDefault();
       const et=document.getElementById("et").value||state.et, bi=document.getElementById("birth").value;
       if(et!==state.et) setzen("daten/et",{v:et,ts:Date.now()});
@@ -1069,7 +1083,6 @@ document.addEventListener("keydown",e=>{ if(state.tab!=="woche"||dlg.open||/INPU
 const h=location.hash.replace("#",""); if(["woche","spruenge","notfall","mehr"].includes(h)) state.tab=h;
 render();
 verbinden();
-if("serviceWorker" in navigator&&location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
   "name": "Babywochen-Kompass",
   "short_name": "Babywochen",
   "description": "Woche für Woche: was das Baby lernt, Spiele, Sprünge und unsere Notizen",
+  "id": "/babywochen/app",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
