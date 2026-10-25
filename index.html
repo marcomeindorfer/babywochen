@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Babywochen-Kompass</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="theme-color" content="#f2f6fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141a26" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Babywochen">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,800;1,400&display=swap">
+<style>
+/* Layout: ein Bilderbuch-Himmel oben (Phase der Woche als Wetter), darunter sechs farbige Fragekarten; feste Leiste unten mit vier Bereichen. */
+:root{
+  --bg:#f2f6fb; --surface:#ffffff; --ink:#26324a; --muted:#64708a; --line:#dde5ef;
+  --accent:#3e8fd0;
+  --q1:#4a9be0; --q1s:#e3f0fc;   /* lernen - himmelblau */
+  --q2:#2fa98a; --q2s:#dff4ee;   /* spielen - minze */
+  --q3:#d99a1c; --q3s:#fcf1d8;   /* erwarten - sonnengelb */
+  --q4:#e0667a; --q4s:#fce5e9;   /* braucht - rosa */
+  --q6:#d9733a; --q6s:#fce8dc;   /* gewohnheiten - apricot */
+  --q5:#8a73d6; --q5s:#ece8fa;   /* umgang - flieder */
+  --storm:#6a6fb3; --storms:#e6e6f6; --sun:#e0a019; --suns:#fdf0d2; --calm:#4a9be0; --calms:#e3f0fc;
+  --alert:#c4473a; --alerts:#fbe6e2;
+  --sky1:#cfe6fb; --sky2:#f6fbff; --cloud:#ffffff;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a26; --surface:#1d2535; --ink:#e7ecf5; --muted:#a2adc4; --line:#2e3a50; --accent:#7ab8ef;
+  --q1:#7ab8ef; --q1s:#1f3149; --q2:#5fd0b2; --q2s:#173832; --q3:#f0bf55; --q3s:#3a3017; --q4:#f2909f; --q4s:#3e2229; --q5:#b4a3f0; --q5s:#2c2747; --q6:#f4a77a; --q6s:#3d281c;
+  --storm:#a9adf0; --storms:#2a2c4c; --sun:#f0bf55; --suns:#3a3017; --calm:#7ab8ef; --calms:#1f3149;
+  --alert:#f2907f; --alerts:#3f2420; --sky1:#22314c; --sky2:#1a2333; --cloud:#2c3a55; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a26; --surface:#1d2535; --ink:#e7ecf5; --muted:#a2adc4; --line:#2e3a50; --accent:#7ab8ef;
+  --q1:#7ab8ef; --q1s:#1f3149; --q2:#5fd0b2; --q2s:#173832; --q3:#f0bf55; --q3s:#3a3017; --q4:#f2909f; --q4s:#3e2229; --q5:#b4a3f0; --q5s:#2c2747; --q6:#f4a77a; --q6s:#3d281c;
+  --storm:#a9adf0; --storms:#2a2c4c; --sun:#f0bf55; --suns:#3a3017; --calm:#7ab8ef; --calms:#1f3149;
+  --alert:#f2907f; --alerts:#3f2420; --sky1:#22314c; --sky2:#1a2333; --cloud:#2c3a55; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.15}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+
+/* Himmel */
+.sky{position:relative;margin-top:0;border-radius:28px;padding:22px 20px 20px;overflow:hidden;background:linear-gradient(180deg,var(--sky1),var(--sky2))}
+.sky.storm{--sky1:var(--storms)} .sky.sun{--sky1:var(--suns)}
+.sky .art{position:absolute;right:-6px;top:-4px;width:150px;height:110px;opacity:.95;pointer-events:none}
+.sky .eyebrow{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sky h1{font-size:clamp(1.9rem,7vw,2.6rem);margin-top:4px;max-width:78%}
+.sky .band{color:var(--muted);font-weight:600;margin-top:2px;max-width:75%}
+.nav-row{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.round{width:42px;height:42px;border-radius:50%;border:0;background:var(--surface);display:grid;place-items:center;box-shadow:0 1px 0 var(--line)}
+.round:disabled{opacity:.4;cursor:default}
+.round svg{width:20px;height:20px}
+.today-btn{border:0;border-radius:999px;background:var(--surface);padding:9px 16px;font-weight:800;box-shadow:0 1px 0 var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:.9rem;font-weight:800;background:var(--surface)}
+.chip svg{width:18px;height:18px}
+.chip.storm{color:var(--storm)} .chip.sun{color:var(--sun)} .chip.calm{color:var(--calm)}
+
+/* Wochenleiste */
+.strip-box{margin-top:14px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:thin}
+.strip{display:flex;gap:5px;width:max-content;align-items:flex-end}
+.wk{position:relative;width:42px;flex:none;border:0;background:var(--surface);border-radius:14px;padding:8px 0 5px;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 1px 0 var(--line)}
+.wk .n{font-size:.82rem;font-weight:800;color:var(--muted)}
+.wk svg{width:18px;height:18px;display:block;margin:2px auto 0}
+.wk.storm{background:var(--storms);color:var(--storm)} .wk.sun{background:var(--suns);color:var(--sun)} .wk.calm{color:var(--calm)}
+.wk.today::after{content:"";position:absolute;left:12px;right:12px;bottom:-6px;height:4px;border-radius:4px;background:var(--q4)}
+.wk[aria-current="true"]{outline:3px solid var(--ink);outline-offset:-3px}
+.wk .m{position:absolute;top:-17px;left:0;font-size:.68rem;font-weight:800;color:var(--muted);white-space:nowrap}
+.strip.hasm{padding-top:16px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend svg{width:16px;height:16px}
+
+/* Auf einen Blick */
+.glance{margin-top:18px;background:var(--surface);border-radius:22px;padding:16px 18px;display:grid;gap:10px;border:1px solid var(--line)}
+.glance h2{font-size:1.15rem}
+.glance .g{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start}
+.glance .g svg{width:26px;height:26px}
+.glance .g b{display:block;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.event{border-radius:16px;padding:10px 14px;background:var(--alerts)}
+.event b{color:var(--alert)}
+
+/* Sprungmarken */
+.jump{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin:18px -16px 0;padding:8px 16px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.jump button{flex:none;border:0;border-radius:999px;padding:6px 12px 6px 8px;font-weight:800;font-size:.88rem;display:inline-flex;align-items:center;gap:6px}
+.jump svg{width:18px;height:18px}
+
+/* Fragekarten */
+.q{margin-top:16px;border-radius:24px;background:var(--surface);border:1px solid var(--line);overflow:hidden;scroll-margin-top:64px}
+.q header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--qs)}
+.q header .badge{width:42px;height:42px;border-radius:14px;background:var(--surface);display:grid;place-items:center;flex:none;color:var(--qc)}
+.q header .badge svg{width:24px;height:24px}
+.q h2{font-size:1.25rem;color:var(--ink)}
+.q ul{list-style:none;margin:0;padding:6px 8px 10px}
+.q li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:start;padding:10px 8px;border-bottom:1px dashed var(--line)}
+.q li:last-child{border-bottom:0}
+.q li .dot{width:10px;height:10px;border-radius:50%;background:var(--qc);margin-top:8px}
+.q li.leap .dot{background:var(--storm);border-radius:3px;transform:rotate(45deg)}
+.q li .t{min-width:0}
+.q li .how{display:block;margin-top:4px;font-size:.9rem;line-height:1.45;color:var(--muted)}
+.q li .how b{color:var(--qc);font-weight:800}
+.q li .tag{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--storm);margin-right:6px}
+.info{width:34px;height:34px;border-radius:50%;border:2px solid var(--qs);background:var(--surface);color:var(--qc);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1rem}
+.info:hover{background:var(--qs)}
+.q1{--qc:var(--q1);--qs:var(--q1s)} .q2{--qc:var(--q2);--qs:var(--q2s)} .q3{--qc:var(--q3);--qs:var(--q3s)} .q4{--qc:var(--q4);--qs:var(--q4s)} .q5{--qc:var(--q5);--qs:var(--q5s)} .q6{--qc:var(--q6);--qs:var(--q6s)}
+.jump .q1,.jump .q2,.jump .q3,.jump .q4,.jump .q5,.jump .q6{background:var(--qs);color:var(--ink)}
+.jump button svg{color:var(--qc)}
+.src{display:inline-flex;gap:4px;flex-wrap:wrap;margin-left:4px;vertical-align:1px}
+.src i{font-style:normal;font-size:.68rem;font-weight:800;color:var(--muted);background:var(--bg);border-radius:6px;padding:0 5px}
+
+/* Notiz */
+.notebox{margin-top:16px;border-radius:24px;background:var(--surface);border:1px solid var(--line);padding:16px}
+.notebox h2{font-size:1.15rem;margin-bottom:8px}
+textarea,input{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:10px 12px;width:100%}
+textarea{min-height:110px;resize:vertical}
+.small{font-size:.85rem;color:var(--muted)}
+.note{font-size:.88rem;color:var(--muted);margin-top:20px}
+
+/* Seiten */
+.page-head{margin-top:16px}
+.page-head h1{font-size:clamp(1.7rem,6vw,2.3rem)}
+.page-head p{color:var(--muted);margin:6px 0 0}
+.stack{display:grid;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px 18px;min-width:0}
+.card h3{font-size:1.15rem;margin-bottom:6px}
+.card ul{margin:6px 0 0;padding-left:20px}
+.card.red{background:var(--alerts);border-color:transparent}
+.card.red h3{color:var(--alert)}
+.leapcard{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start}
+.leapnum{width:52px;height:52px;border-radius:18px;background:var(--storms);color:var(--storm);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.4rem}
+.leapcard.now .leapnum{background:var(--storm);color:var(--surface)}
+.leapcard .when{font-size:.88rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:800;padding:0;margin-top:4px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+label{display:grid;gap:4px;font-weight:800;font-size:.9rem}
+.btn{border:0;background:var(--accent);color:var(--surface);border-radius:999px;padding:10px 18px;font-weight:800}
+.btn.btn2{background:var(--q1s);color:var(--ink)}
+.version{text-align:center}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+
+/* Unten-Leiste */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tabbar button{border:0;background:none;border-radius:16px;padding:6px 4px;display:grid;justify-items:center;gap:2px;font-size:.78rem;font-weight:800;color:var(--muted)}
+.tabbar svg{width:24px;height:24px}
+.tabbar button[aria-current="page"]{color:var(--ink);background:var(--q1s)}
+.tabbar button.sos[aria-current="page"]{background:var(--alerts);color:var(--alert)}
+
+/* Info-Blatt */
+dialog{border:0;padding:0;border-radius:26px 26px 0 0;width:100%;max-width:640px;max-height:86vh;margin:auto auto 0;background:var(--surface);color:var(--ink)}
+@media (min-width:700px){dialog{border-radius:26px;margin:auto}}
+dialog::backdrop{background:rgba(20,26,38,.45)}
+.sheet{padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto;max-height:86vh}
+.grip{width:44px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 12px}
+.sheet .kicker{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--qc,var(--muted))}
+.sheet h2{font-size:1.5rem;margin:4px 0 8px}
+.sheet .ctx{background:var(--bg);border-radius:14px;padding:10px 12px;font-size:.95rem;margin-bottom:12px}
+.sheet .lead{font-size:1.02rem}
+.sheet ul{padding-left:20px;margin:10px 0 0;display:grid;gap:8px}
+.sheet .srclist{margin-top:16px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.close{position:sticky;top:0;float:right;width:38px;height:38px;border-radius:50%;border:0;background:var(--bg);font-size:1.3rem;line-height:1}
+@media (prefers-reduced-motion:no-preference){.q,.glance{animation:rise .3s ease-out both}@keyframes rise{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <main id="view"></main>
+</div>
+
+<nav class="tabbar" aria-label="Bereiche"><div class="in">
+  <button data-tab="woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Woche</button>
+  <button data-tab="spruenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18c3 0 3-8 6-8s3 6 6 6 3-10 6-10"/></svg>Sprünge</button>
+  <button data-tab="notfall" class="sos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-4.6-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.4-8 11-8 11z"/><path d="M12 9v4M10 11h4"/></svg>Notfall</button>
+  <button data-tab="mehr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mehr</button>
+</div></nav>
+
+<dialog id="sheet" aria-labelledby="sheetTitle"><div class="sheet" id="sheetBody"></div></dialog>
+
+<script>
+/* =========================================================
+   QUELLEN - alle aus dem Repo „elternsein“
+   ========================================================= */
+const SRC = {
+  oje:{k:"Oje",t:"Oje, ich wachse! (van de Rijt/Plooij)",f:"00-vorbereitung/erziehungsquellen/oje-ich-wachse.md"},
+  agb:{k:"AG-Baby",t:"artgerecht - Das andere Baby-Buch (Schmidt)",f:"00-vorbereitung/erziehungsquellen/artgerecht-das-andere-baby-buch.md"},
+  agk:{k:"AG-klein",t:"artgerecht - Das kleine Baby-Buch (Schmidt)",f:"00-vorbereitung/erziehungsquellen/artgerecht-das-kleine-baby-buch.md"},
+  fam:{k:"AG-Alltag",t:"artgerecht durch den Familienalltag (Schmidt)",f:"00-vorbereitung/erziehungsquellen/artgerecht-durch-den-familienalltag.md"},
+  agp:{k:"AG-Podcast",t:"artgerecht-Podcast (Schreien, Pausen, Babys und Zeit, Lob, Nein)",f:"00-vorbereitung/erziehungsquellen/artgerecht-podcast-*.md"},
+  kd:{k:"KidsDoc",t:"KidsDoc-Buch (Dr. Gatinho)",f:"20-elternsein/gesundheit/kidsdoc-buch.md"},
+  kdp:{k:"KidsDoc-Pod",t:"KidsDoc-Podcast (Erste Hilfe, Kinderkrankheiten)",f:"20-elternsein/gesundheit/kidsdoc-podcast-*.md"},
+  eos:{k:"EoS",t:"Erziehen ohne Schimpfen (Schmidt)",f:"00-vorbereitung/erziehungsquellen/erziehen-ohne-schimpfen.md"},
+  slow:{k:"Slow",t:"Slow Family (Dibbern/Schmidt)",f:"00-vorbereitung/erziehungsquellen/slow-family.md"},
+  inb:{k:"inBindung",t:"inBindung-Podcast (Regulation statt Eskalation, Angst, Beten ist Bindung)",f:"00-vorbereitung/erziehungsquellen/inbindung-podcast-*.md"},
+  hab:{k:"Habits",t:"Habits of the Household (Earley)",f:"00-vorbereitung/erziehungsquellen/habits-of-the-household.md"},
+  tw:{k:"Tech-Wise",t:"The Tech-Wise Family (Crouch)",f:"00-vorbereitung/erziehungsquellen/the-tech-wise-family.md"},
+  emp:{k:"Empower",t:"EMPOWER (Teichen)",f:"00-vorbereitung/erziehungsquellen/empower.md"},
+  sheet:{k:"Sheet",t:"Erste-Lebenswochen-Sheet (Synthese im Repo)",f:"00-vorbereitung/erste-lebenswochen-sheet.md"},
+  allg:{k:"allg.",t:"Allgemeines Wissen, nicht aus den Repo-Quellen - mit Kinderarzt oder Hebamme prüfen",f:"-"}
+};
+
+/* =========================================================
+   THEMEN - Inhalt der Info-Blätter (ⓘ)
+   Jeder Punkt: "Text|quellen"
+   ========================================================= */
+const TOPICS = {
+ sprung:{t:"Was sind Sprünge?",lead:"Mentale Entwicklungsschritte, vor denen Babys für einige Tage oder Wochen anhänglicher, weinerlicher und unruhiger werden.",pts:[
+  "Zehn Sprünge in den ersten 20 Monaten, gerechnet ab dem errechneten Termin, nicht ab der Geburt|oje",
+  "Typische Zeichen: mehr Weinen, Klammern, schlechter schlafen und trinken, Fremdeln, mehr Daumenlutschen|oje",
+  "Danach kann das Baby etwas Neues, und meist folgt eine fröhlichere, selbstständigere Phase|oje",
+  "Ab Sprung 4 dauern die schwierigen Phasen oft rund fünf Wochen, vorher meist Tage bis eine Woche|oje",
+  "Was hilft: mehr Nähe, Tragen, Trösten. In guten Phasen herausfinden, was beruhigt, und das in schwierigen nutzen|oje",
+  "Erst Krankheit ausschließen, dann an einen Sprung denken - im Zweifel Kinderarzt|oje,kd",
+  "Die Wochenangaben beruhen auf kleinen Beobachtungsgruppen und sind grobe Anhaltspunkte (±1-2 Wochen)|oje"]},
+ naehe:{t:"Nähe und Trösten",lead:"Babys kommen als „physiologische Frühgeburten“ und sind für ständigen Körperkontakt gebaut.",pts:[
+  "Ein Säugling kann nicht zu viel Aufmerksamkeit bekommen; die Verwöhn-Idee stammt aus der NS-Erziehungslehre (Johanna Haarer)|kd",
+  "Verwöhnen gibt es in den ersten Lebensjahren nicht, jedes Weinen hat einen Grund|agk,oje",
+  "Körperkontakt puffert Stress im Körper, auch wenn das Weinen weitergeht - dann im Arm weinen lassen, nicht allein|sheet,agp",
+  "Prompt reagieren: Babys möglichst innerhalb von Sekunden, Kleinkinder innerhalb von 20-40 Sekunden|fam",
+  "„Babys sollten weinen dürfen, aber nicht weinen müssen.“|kd",
+  "Eltern-Energie-Erhaltungssatz: Die Energie, die ihr jetzt in Nähe steckt, spart ihr später|agb",
+  "Täglich mindestens eine halbe Stunde exklusiv mit dem Kind, ohne Handy - auch zur Reparatur nach schwierigen Tagen|fam"]},
+ tragen:{t:"Tragen",lead:"Menschenbabys sind „Traglinge“: Sie klammern, nehmen von selbst die Anhock-Spreiz-Haltung ein und beruhigen sich am Körper.",pts:[
+  "Immer mit dem Gesicht zum Träger, aufrecht, Atemwege frei, nicht überhitzen (dünn anziehen, Jacke über beide)|agb",
+  "Für Neugeborene empfiehlt das Buch Tragetuch oder Mei Tai - gut, wenn beide Eltern tragen (Bänder statt vieler Schnallen)|agb",
+  "Eine Trageberatung gibt es wie die Stillberatung; vorher ausprobieren|agb,agk",
+  "Tipp: sich als Paar gegenseitig huckepack nehmen, um zu spüren, wie sich gute und schlechte Haltung anfühlen|agb",
+  "„Das Tragen ist das Stillen der Väter“ - eigene Bindung und Selbstwirksamkeit|agb",
+  "Tragen schon kurz nach der Geburt, viel tragen in Sprungphasen|oje",
+  "Kinderwagen ist trotzdem okay - es gibt keine Medaille fürs Nie-Benutzen|agb"]},
+ stillstart:{t:"Stillstart",lead:"Stillen will gelernt sein. Fast alle haben in den ersten Wochen Schwierigkeiten - das ist normal.",pts:[
+  "Nach der Geburt Haut an Haut: Zwischen die Brüste gelegt finden die meisten Babys die Brust selbst|agb",
+  "In den ersten Tagen mindestens alle 3 Stunden anlegen, notfalls sanft wecken; danach nach Bedarf|agb,kd",
+  "„Mund voll Brust“: Baby zur Brust, nicht Brust zum Baby; Bauch an Bauch; Positionen wechseln|agb",
+  "Milcheinschuss nach 2-4 Tagen, vorher reicht das Kolostrum|agb",
+  "Genug Milch, wenn es 6-8 nasse Windeln am Tag hat, zunimmt und rosig ist|agb,kd",
+  "Stillberaterin schon vor der Geburt notieren - Hebammen sind nicht automatisch ausgebildete Stillberaterinnen|agb,kd",
+  "Wiegen höchstens einmal pro Woche; Wiegepanik ist ein Hauptgrund für Stress und weniger Milch|agb",
+  "Gestillte Babys brauchen weder Wasser noch Tee. Wer nicht stillen kann oder will: kein schlechtes Gewissen, Nähe geht auch mit Flasche|kd"]},
+ hunger:{t:"Hungerzeichen",lead:"Weinen ist ein spätes Hungerzeichen. Wer früher reagiert, hat ein ruhigeres Baby.",pts:[
+  "Stufe 1: sucht, schmatzt, öffnet den Mund, dreht den Kopf, klopft im Tuch an - sofort anlegen|agb",
+  "Stufe 2: zappelt, streckt sich, Hand zum Mund - spätestens jetzt|agb",
+  "Stufe 3: schreit, wird rot - erst beruhigen, dann trinken|agb",
+  "„Wenn das Baby erst mal weint, haben wir schon die ersten zwei Stufen verpasst.“|agb",
+  "Nach Bedarf füttern, nicht nach festem 3-Stunden-Takt - auch mit Flasche|agk,kd"]},
+ cluster:{t:"Clusterfeeding und Dauerstillen",lead:"Abends oder in Wachstumsphasen will das Baby fast ununterbrochen trinken.",pts:[
+  "Clusterfeeding ist normal und kein Zeichen für zu wenig Milch; Zufüttern ist im ersten Jahr meist nicht nötig|agb,kd",
+  "Mama mit Snacks und Getränk versorgen; danach übernimmt Papa das Baby, damit sie schläft|kd,sheet",
+  "In Sprungphasen wollen Babys die Brust oft zum Trösten, trinken aber wenig - weiterstillen|oje",
+  "Stillgruppen bekommen auffällig viele Anfragen um die 3. und 6. Woche und den 3. und 6. Monat|oje",
+  "Hält es länger an: Stillberaterin fragen|agb"]},
+ stillprobleme:{t:"Schnelle Hilfe bei Stillproblemen",lead:"Ziehen am Anfang ist normal, Schmerz an der Brustwarze nicht.",pts:[
+  "Wunde Brustwarzen: Anlegen prüfen lassen, Muttermilch einreiben und trocknen lassen, Luft, häufig anlegen|agb",
+  "Milchstau (Knoten, rote Stelle): Bettruhe, vorher Wärme, danach kühlen, ausstreichen, weiterstillen|agb",
+  "Plus Fieber über 38,4 °C = Brustentzündung: weiterstillen, Hebamme anrufen, Arzt bei Fieber über 24 Stunden|agb",
+  "Zu wenig Milch: häufiger anlegen, nachts stillen, Schnuller und Flasche weglassen, Ruhe, essen, trinken|agb",
+  "Hilfe: Stillberaterin (z. B. AFS, La Leche Liga)|agb,kd"]},
+ papa:{t:"Die Rolle des Vaters",lead:"Väter sind von Anfang an eigenständige Bezugspersonen - nicht nur Unterstützung der Mutter.",pts:[
+  "Bei der Geburt: Schnittstelle nach außen - Unterlagen, Personal, Licht, freundlich Nein sagen; tun, was sie jetzt braucht|agb",
+  "Beim Kaiserschnitt nimmt der Vater das Baby nackt auf die Brust|agb",
+  "Beim Stillen: Getränk und Essen bringen, Telefon und Klingel, Bäuerchen, Wickeln, Rückendeckung gegen Kommentare|agb,sheet",
+  "Eine feste tägliche Aufgabe allein mit dem Baby (z. B. erste Wickelrunde, Abendspaziergang)|sheet",
+  "Das schreiende Baby nicht reflexhaft abgeben, sondern „umschnallen“ - so wächst die Routine|emp,agb",
+  "Mama lässt Papa eigene Wege finden; anders ist nicht schlechter|agb",
+  "Positionscheck nach einigen Monaten: Ist Mama noch viel näher dran? Dann gemeinsam hinschauen|emp",
+  "Väter brauchen andere Väter zum ehrlichen Austausch; Wochenbettdepression kann auch Väter treffen|agb,kd"]},
+ schlafsicher:{t:"Sicherer Schlaf",lead:"Die wichtigsten Regeln für das erste Jahr - bei euch mit Beistellbett.",pts:[
+  "Immer Rückenlage im Schlafsack; wach darf es auf den Bauch|kd",
+  "Kein Kissen, keine Decke, kein Nestchen, keine Kuscheltiere im Babybett|kd",
+  "Eigenes Bett im Elternschlafzimmer; das Beistellbett lückenlos und auf gleicher Höhe befestigen|kd,sheet",
+  "Am sichersten ist laut Kinderarzt Prof. Jorch das eigene Bett im Elternschlafzimmer - genau eure Lösung|agb",
+  "16-18 °C, Wärme im Nacken prüfen, keine Mütze im Bett, rauchfrei|kd,agb",
+  "Niemals mit dem Baby auf dem Sofa einschlafen; nie im Elternbett nach Alkohol, Medikamenten oder bei extremer Erschöpfung|agb,sheet",
+  "Keine ätherischen Öle im Babyzimmer|kd"]},
+ einschlafen:{t:"Wege in den Schlaf",lead:"Einschlafbegleitung ist kein Fehler, sondern altersgemäß.",pts:[
+  "Wege: Ruhe, „Langeweile“ (Flur auf und ab), Bewegung, raus, loslassen, selbst runterfahren|agb",
+  "Timing: müde, aber nicht übermüdet - Augen reiben, gähnen, leerer Blick, Wegdrehen|agb,kd",
+  "Tragen, Wiegen, Stillen in den Schlaf ist in den ersten Wochen normal|sheet,agb",
+  "Die ins Bett bringende Person reguliert zuerst sich selbst - entspannt fast bis zum Einschlafen|fam",
+  "Der Tag stellt die Nacht ein: Tageslicht, Bewegung draußen, ruhiger Nachmittag und Abend|agb,fam",
+  "Kurze Rituale (Bad oder Massage, Lied, Segen) geben Halt|kd,sheet,hab",
+  "Bei Kleinkindern sind 30-90 Minuten Einschlafbegleitung weltweit normal|fam"]},
+ ablegen:{t:"Schlafendes Baby ablegen",lead:"Viele Babys wachen beim Ablegen auf - mit Geduld klappt es öfter.",pts:[
+  "Bis zum Tiefschlaf warten (bis zu 20 Minuten)|agb",
+  "Test: Ärmchen etwa 5 cm anheben und loslassen - fällt es schlaff wie bei einer Puppe, ist es so weit|agb",
+  "Nicht auf den Rücken plumpsen lassen, sondern in einer Spirale ablegen: Füße, Beine, Po, Seite, Rücken|agb",
+  "Druck und Wärme erst langsam lösen: Hand liegen lassen, im Tuch ablegen|agb",
+  "Ein Neugeborenes lebt in den ersten Wochen oft an oder auf jemandem - das darf so sein|agb"]},
+ schlaftraining:{t:"Warum kein Schlaftraining",lead:"Alle Quellen im Repo raten davon ab.",pts:[
+  "„Babys lernen nicht - sie geben auf.“ Stresshormone bleiben hoch|kd",
+  "In einer Studie weinten Babys nach drei Tagen Schlaftraining nicht mehr, ihr Cortisol blieb aber erhöht|fam",
+  "Wer so überfordert ist, dass er das Baby schütteln möchte, braucht Unterstützung, kein Training|agb",
+  "Durchschlafen heißt in der Forschung 5 Stunden - und ist in den ersten Jahren die Ausnahme|agb,kd",
+  "Wer es schon gemacht hat: ab jetzt wieder ko-regulieren; Eltern dürfen ihre Meinung ändern|fam"]},
+ schreien:{t:"Schreiabende",lead:"Viele Babys weinen abends viel - meist wegen Reifung und Reizverarbeitung, nicht wegen „Koliken“.",pts:[
+  "Schreien nimmt oft bis Woche 6-8 zu; der Gipfel um Woche 10-14 hängt mit der Gehirnentwicklung zusammen|agb,fam",
+  "Weinen begleiten statt abstellen: im Arm, Herzschlag, ruhig atmen|fam,sheet",
+  "Treppensteigen mit dem Baby im Tuch vertieft euren Atem und baut Stress ab|fam",
+  "Reize runter, Körperkontakt rauf; manche Babys beruhigt wildes Tanzen eng im Tuch, danach langsamer|agb,sheet",
+  "Schreibaby-Faustregel: mehr als 3 Std. am Tag, an mehr als 3 Tagen pro Woche, über 3 Wochen - euer Leidensdruck zählt mehr als die Regel|kd,agb",
+  "Hilfe: Schreiambulanz (für Kinder bis 3 Jahre), Hebamme, Kinderarzt|kd,agb,emp"]},
+ ueberforderung:{t:"Wenn ihr nicht mehr könnt",lead:"Überforderung ist echt und kein Versagen. Wichtig ist, was ihr dann tut.",pts:[
+  "Baby sicher ins Bett legen, Raum verlassen, durchatmen, Partner, Freundin oder Hebamme anrufen|sheet",
+  "Niemals schütteln - Hirnblutungen und Lebensgefahr|oje,sheet",
+  "Aggressive Gefühle sind nicht unnormal, handeln darf man nicht danach - dann Beratungsstelle anrufen|oje",
+  "Seid ihr nur sauer, bleibt beim Kind und kommt vor Ort runter; seid ihr überfordert, geht kurz raus - Sicherheit geht vor|fam",
+  "Notfall-Tipps: Lautstärke runter, am offenen Fenster atmen, ankündigen „Ich brauche kurz Zeit“, danach entschuldigen|kd",
+  "„Bedürfnisorientiert plus wenig Unterstützung ist ein Ticket in den Burn-out“ - deshalb Hilfe von Anfang an|agb"]},
+ wochenbett:{t:"Wochenbett",lead:"Die ersten Wochen gehören der Erholung und dem Kennenlernen.",pts:[
+  "Ihr bestimmt, wer zu Besuch kommt und wann ihr das Baby bei euch habt|kd,oje",
+  "Besuch bringt Essen mit oder hängt Wäsche auf - nicht umgekehrt|agk,kd",
+  "Nachwehen beim Stillen, Wochenfluss und ein geschwächter Beckenboden sind normal|agb",
+  "Schlafen, wenn das Baby schläft; der Haushalt wartet|sheet,agb",
+  "Babyblues ist häufig. Traurigkeit, Leere oder Schuldgefühle über Wochen: Hebamme ansprechen - auch Väter können erkranken|agb,kd"]},
+ paar:{t:"Für euch als Paar",lead:"Die Paarbeziehung trägt die Familie - sie braucht feste Zeiten.",pts:[
+  "Seglertrick: im Alltag nur auf etwa 80 % fahren, damit für Zahnen, Schübe und Infekte Reserve bleibt|agb",
+  "„Hinsetzen muss getan werden“ - fünf Minuten sitzen, auch wenn noch viel zu tun ist|agb",
+  "Paarzeit fest in den Kalender, ein Spaziergang reicht - als Paar reden, nicht über Babythemen|emp,agb",
+  "Ein freier Abend pro Woche für jeden|emp,kd",
+  "Nacht in Zuständigkeiten teilen und den Schlafmangel des anderen anerkennen|agb",
+  "Pufferzone beim Heimkommen: Runde um den Block, dann „müdes Abendkind“ statt Feierabend|fam",
+  "Hilfe von Anfang an annehmen - das Dorf baut sich nicht von allein|agb,slow"]},
+ bonding:{t:"Geburt und Bonding",lead:"Die erste Stunde ist besonders - und Bindung lässt sich auch später noch stärken.",pts:[
+  "Erste Stunde: nicht wiegen oder waschen, U1 auf Mamas Bauch, Haut an Haut|agb",
+  "Wünsche vorher mit Klinik und Hebamme klären (Bonding, Nabelschnur, Vitamin K)|agb",
+  "Bei Kaiserschnitt: Baby ungewaschen auf die nackte Brust, zusammenbleiben|agb",
+  "Bindung ist ein Prozess, kein Einzelereignis - nach schwerem Start helfen viel Kuscheln, prompte Reaktion und Zeit|fam,kd",
+  "Starthilfe: Bonding-Bad - Baby nass und warm auf Mamas Bauch, auch zu Hause|agb"]},
+ sinne:{t:"Was Neugeborene wahrnehmen",lead:"Neugeborene können mehr, als man denkt.",pts:[
+  "Sehen scharf auf etwa 20 cm - genau der Abstand beim Stillen|oje",
+  "Lieben Gesichter, starke Kontraste, Streifen und Rot|oje",
+  "Erkennen eure Stimmen gleich nach der Geburt, mögen hohe Stimmen; plötzlicher Lärm ist unangenehm|oje",
+  "Erkennen Mamas Geruch, auch an einem getragenen Kleidungsstück|oje",
+  "Ahmen Gesichtsbewegungen nach, wenn man ihnen Zeit lässt|oje",
+  "Reflexe (Greifen, Saugen, Moro-Reflex) verschwinden in den ersten Monaten|oje"]},
+ sprache:{t:"Sprache von Anfang an",lead:"Bei der Sprache gilt nicht „jedes Kind hat sein Tempo“ - früh viel reden und Auffälligkeiten ernst nehmen.",pts:[
+  "Von Anfang an mit dem Baby sprechen und den Alltag begleiten („Jetzt ziehen wir die Jacke an“)|kd",
+  "Laute nachahmen, Pausen lassen - ein Gespräch abwechselnd|oje,kd",
+  "Bücher gemeinsam anschauen, Reime und Lieder; Fernseher und Hörspiele ersetzen das nicht|kd",
+  "Richtig wiederholen statt korrigieren („Ja, du hast die Püppi geholt!“)|kd,oje",
+  "Erste Wörter um den ersten Geburtstag, mit 2 Jahren etwa 50 Wörter|kd",
+  "Mehrsprachigkeit ist ein Geschenk, kein Risiko|kd"]},
+ bauchlage:{t:"Bewegung und Bauchlage",lead:"Freie Bewegung auf dem Boden fördert die Entwicklung am besten.",pts:[
+  "Wache Bauchlage von Anfang an: erst 20-30 Sekunden, ab 3 Monaten mehrere Minuten, gern auf eurer Brust|kd",
+  "Beugt einem flachen Hinterkopf vor; Babyschale nur zum Transport|kd",
+  "Viel Bodenzeit auf einer Decke statt Wippe|kd",
+  "Nicht hinsetzen, bevor es selbst sitzt; nicht an den Armen hochziehen (das „Hochziehspiel“ aus Oje übernehmen wir nicht)|kd,oje",
+  "Nackt strampeln lässt es seinen Körper besser kennenlernen|oje"]},
+ spielen:{t:"Spielen mit Babys",lead:"Babys brauchen kein Programm - ihr seid das spannendste Spielzeug.",pts:[
+  "Gesicht, Stimme, Lieder, Grimassen - mehr braucht es anfangs nicht|oje,tw",
+  "Schaut das Baby weg oder dreht den Körper weg, will es Pause|oje",
+  "Geplante Spielstunden passen nicht: „Ein Baby ist kein Video, das man einschalten kann.“|oje",
+  "Alltagsgegenstände und echte Dinge statt viel Spielzeug|fam,oje",
+  "Draußen sein: Gras, Sand, Blätter, Himmel|slow,agb",
+  "Es ist nicht eure Aufgabe, ständig zu bespielen - beschützen, trösten, ernähren steht vorn|fam"]},
+ beikost:{t:"Beikost",lead:"Beikost ist eine Beigabe, kein Ersatz - Milch bleibt lange Hauptnahrung.",pts:[
+  "Start frühestens Beginn 5., spätestens Beginn 7. Monat; entscheidend ist das Kind|kd",
+  "Reifezeichen: hält den Kopf, steckt gezielt Dinge in den Mund, Zungenstoßreflex ist weg|kd",
+  "Klassisch: Gemüsebrei mittags, ab etwa 6 Monaten mit Fleisch (Eisen), dann Milch-Getreide- und Obst-Getreide-Brei|kd",
+  "Gläschen sind okay; kein Salz, kein Zucker, kein Honig im ersten Jahr|kd",
+  "Hochstuhl erst, wenn es sicher sitzt; mit Fußstütze, nie allein|kd",
+  "Weiches Fingerfood ist möglich; kein Zwang beim Essen|kd,oje"]},
+ allergene:{t:"Allergien vorbeugen",lead:"Vermeiden beugt nicht vor - Vielfalt schon.",pts:[
+  "Allergene Lebensmittel früh und regelmäßig anbieten (mindestens einmal pro Woche)|kd",
+  "Gluten im Zeitfenster 5.-7. Monat einführen|kd",
+  "HA-Nahrung ohne Allergierisiko nicht nötig|kd",
+  "Beste Vorbeugung ist Stillen|kd"]},
+ zaehne:{t:"Zähne",lead:"Zahnen und Sprünge fallen nicht unbedingt zusammen.",pts:[
+  "Erster Zahn meist um 6 Monate, bis 2,5 Jahre alle 20 Milchzähne|oje,kd",
+  "Fieber oder Durchfall kommen nicht vom Zahnen - dann ist das Baby krank|oje,kd",
+  "Linderung: kühler Beißring, Zahnfleischmassage|kd,agb",
+  "Ab dem ersten Zahn zweimal täglich putzen, Eltern putzen bis ins Grundschulalter nach|kd",
+  "Schnuller und Löffel nicht ablecken; keine gesüßten Getränke|kd",
+  "Fluorid und Vitamin D: Variante mit dem Kinderarzt klären|kd"]},
+ verdauung:{t:"Windeln und Verdauung",lead:"Was in der Windel normal ist - und was nicht.",pts:[
+  "Kindspech in den ersten 48 Stunden; danach anfangs etwa 3 Stuhlwindeln am Tag|kd",
+  "Vollgestillte bis 3 Monate: bis zu 14 Tage ohne Stuhl normal, solange es gedeiht|kd",
+  "Pressen und Rotwerden ist normal - Babys müssen Kacken lernen; Beinchen anwinkeln, Bauch im Uhrzeigersinn massieren|kd",
+  "Sehr heller, entfärbter Stuhl: sofort zum Kinderarzt (Stuhlfarbkarte im U-Heft)|kd",
+  "Kein Fencheltee oder Wasser für Neugeborene|kd"]},
+ kindersicher:{t:"Ja-Umgebung",lead:"Probleme organisatorisch lösen statt mit Dauer-Nein.",pts:[
+  "Steckdosen, Kabel, Treppen, Fenster sichern, Möbel kippsicher|fam,kd",
+  "Kleinteile weg (auch In-Ear-Kopfhörer am Boden), keine Tischdecken|fam,kd",
+  "Putzmittel, Medikamente, giftige Pflanzen hoch oder weggeschlossen|fam,kd",
+  "Nie allein auf Wickeltisch, Bett oder Sofa lassen|kd",
+  "Eine Schublade mit Ungefährlichem zum Ausräumen (Tupperware, Kochlöffel, Schneebesen)|fam",
+  "„Stopp“ statt „Nein“|fam"]},
+ fremdeln:{t:"Fremdeln",lead:"Ein wichtiger Entwicklungsschritt, kein Erziehungsthema.",pts:[
+  "Meist um 8-10 Monate, endet zwischen 18 Monaten und 3 Jahren|kd,fam",
+  "Oft stärker gegenüber Männern; schwächer, wenn das Kind viele Bezugspersonen hat|fam",
+  "Angst ernst nehmen, nicht „Ist doch alles gut“|fam,kd",
+  "Verwandte nähern sich sanft, langsam, leise; Kind bleibt auf eurem Arm|fam",
+  "Großeltern erklären: hat nichts mit ihnen persönlich zu tun|fam"]},
+ trennung:{t:"Trennungsangst",lead:"Mit etwa einem halben Jahr versteht das Baby, dass ihr weggehen könnt.",pts:[
+  "Am stärksten klammern viele um Woche 29|oje",
+  "Ankündigen, bevor ihr den Raum verlasst; beim Zimmerwechsel weitersprechen|oje",
+  "Hinterherkrabbeln lassen - das Baby bestimmt den Abstand selbst|oje",
+  "Kuckuck- und Versteckspiele üben das Wiederkommen|oje",
+  "Wichtig für jede Eingewöhnung: lange, mit Bezugsperson in Reichweite|fam,agb"]},
+ umfeld:{t:"Kommentare aus Familie und Umfeld",lead:"Ihr müsst euren Weg nicht verteidigen.",pts:[
+  "Weiteratmen; „Wer fragt, der führt“: „Welche Sorge hast du? Wie war das bei dir?“|fam",
+  "Danken und freundlich bleiben: „Ich nehm das mal mit.“ - „Für uns passt das nicht.“|fam",
+  "Ohne Begründung - Begründungen wirken wie Angriff|fam",
+  "Großeltern: Wer aufpasst, entscheidet über kleine Dinge (z. B. Eis)|emp",
+  "Erst als Paar klären, dann Rat holen|emp"]},
+ grenzen:{t:"Grenzen mit Herz",lead:"Klar und freundlich, ohne Strafen.",pts:[
+  "Ja-Grenze: „Ich sehe, du willst das. Ich verstehe dich. Heute geht es nicht.“ - im Moment nicht erklären|fam",
+  "Konkret, einzeln, respektvoll - und ohne „sonst bin ich traurig“|emp,fam",
+  "Was das Kind zum ersten Mal versteht, darf man erwarten - nicht mehr und nicht weniger|oje",
+  "Beständig statt „konsequent“, logische Folgen statt Strafen|kd",
+  "Teilen nicht erzwingen - unter 3 Jahren gelingt es kaum|emp,fam",
+  "Spielerisch statt Machtkampf: beim Anziehen doof anstellen, aussuchen lassen|fam,eos"]},
+ wut:{t:"Wut und Wutanfälle",lead:"Das junge Gehirn lernt Beruhigung nur durch viele ruhige Begleitungen.",pts:[
+  "Beim Kind bleiben, Gefühl benennen, ruhig halten - Trampelpfade werden zu Alleen|fam,kd",
+  "Keine Auszeiten als Strafe, kein Liebesentzug|kd,eos",
+  "Wen zuerst trösten? Das Kind, das am meisten Beruhigung braucht|fam",
+  "Aggressionshöhepunkt erst mit etwa 4 Jahren|fam",
+  "Eigene Regulation zuerst - Co-Regulation statt Eskalation|inb,eos"]},
+ laufen:{t:"Laufen lernen",lead:"Jedes Kind läuft, wenn es so weit ist.",pts:[
+  "Bis 16 Monate laufen etwa 90 %|kd",
+  "Kein Lauflernhelm, kein Gehfrei - gefährlich und hemmend|kd",
+  "Nicht an den Händen „laufen üben“, lieber Anreize schaffen|kd,oje",
+  "Barfuß oder Antirutschsocken; Schuhe erst, wenn es sicher läuft|kd",
+  "Läuft es mit 20 Monaten noch nicht frei: Kinderarzt|kd"]},
+ bildschirm:{t:"Bildschirme",lead:"Kleine Kinder brauchen echte Menschen, keine Bildschirme.",pts:[
+  "Möglichst keine Bildschirme in den ersten Jahren|kd,tw",
+  "Handy weg beim Stillen, Essen und Spielen - ihr seid Vorbild|tw,emp",
+  "Gerätefreie Stunde vor dem Schlafengehen, Ladeplatz außerhalb des Schlafzimmers|tw,sheet",
+  "Kindersendungen, die Oje für 13-17 Monate empfiehlt, übernehmen wir nicht|tw,kd"]},
+ arzt:{t:"Wann zum Arzt",lead:"Faustregel: lieber einmal zu viel.",pts:[
+  "Baby unter 6 Monaten mit Fieber über 38 °C: sofort (außer kurz nach Impfung)|kd",
+  "Trinkt nicht ausreichend, wenig nasse Windeln, Durchfall, mehr Erbrechen als sonst: Kinderarzt|kd",
+  "Schrilles, nicht zu beruhigendes Weinen, angestrengte Atmung, Apathie: 112|kd",
+  "Mitnehmen: Krankenkassenkarte, U-Heft, Impfpass|kd"]},
+ uterm:{t:"U-Untersuchungen",lead:"Vorsorge beim Kinderarzt - Termine früh vereinbaren.",pts:[
+  "U1 direkt nach der Geburt, U2 am 3.-10. Lebenstag (mit Neugeborenen- und Hörscreening)|kd,allg",
+  "U3 etwa in der 4.-5. Lebenswoche|kd,allg",
+  "U4 mit 3-4 Monaten, U5 mit 6-7 Monaten, U6 mit 10-12 Monaten, U7 mit etwa 2 Jahren|allg,kd",
+  "Kinderarzt idealerweise schon vor der Geburt ausgesucht (habt ihr erledigt)|kd",
+  "Impfungen beginnen meist ab etwa 2 Monaten - Plan mit dem Kinderarzt|allg"]},
+ vitd:{t:"Vitamin D und Fluorid",lead:"Stand des KidsDoc-Buchs - mit Kinderarzt klären.",pts:[
+  "Ab der ersten Lebenswoche täglich Vitamin D (500 IE) und Fluorid (0,25 mg) als Tablette bis zum ersten Zahn|kd",
+  "Danach entweder fluoridhaltige Kinderzahnpasta plus Vitamin D oder fluoridfreie Pasta plus Kombitablette|kd"]},
+ rituale:{t:"Kleine Rituale",lead:"Wiederkehrende Momente geben Halt - dem Baby und euch.",pts:[
+  "Immer gleiches Begrüßungsritual nach dem Aufwachen: Blick, ruhige Stimme, Name|sheet",
+  "Abendsegen mit der Hand auf Brust oder Kopf, jeden Abend gleich|sheet,hab,inb",
+  "Schon in der Schwangerschaft und dann täglich segnen und gute Worte sprechen|emp",
+  "Singen statt Musik vom Band; ein Morgen- und ein Schlaflied|tw,sheet",
+  "Wöchentliches Foto am gleichen Ort plus ein Satz, was neu war|sheet"]},
+ gewohnheiten:{t:"Gewohnheiten statt Vorsätze",lead:"„The heart follows the habit.“ Kinder prägt, was wir tun, nicht was wir erklären.",pts:[
+  "Jede Familie hat schon Gewohnheiten - wer nicht bewusst wählt, übernimmt die der Umgebung (Bildschirme, Hetze)|hab",
+  "Klein anfangen: eine Gewohnheit wählen, nicht alles auf einmal|hab,slow",
+  "Rhythmen statt Programm: Die Abfolge ist fest, die Uhrzeit nicht|sheet",
+  "Gewohnheiten sind Normen, keine Regeln - Ausnahmen und Gnade sind echt|hab",
+  "Jeden-Tag-Effekt: wenige wichtige Dinge regelmäßig statt alles radikal ändern|slow",
+  "Vorsätze innerhalb von 2-3 Tagen als Termin in den Kalender, sonst verpuffen sie|emp"]},
+ segen:{t:"Abendsegen und Elterngebet",lead:"Earleys „Schlüsselgewohnheit“: jeden Abend gleich, mit Hand und Stimme.",pts:[
+  "Kurzform für Babys, Hand auf Brust oder Kopf: „Gott liebt dich. Jesus ist für dich gestorben. Und der Heilige Geist ist bei dir. Gute Nacht.“|hab,sheet",
+  "Das Baby versteht die Worte nicht, gewöhnt sich aber an Stimme, Berührung und Ablauf|sheet",
+  "Sobald es antworten kann, die Augen-Version: „Siehst du meine Augen? … Weißt du, dass ich dich liebe? … Ruh dich aus in dieser Liebe.“|hab",
+  "Elterngebet an der Kinderzimmertür: „Herr, hilf mir. Lass mich von deiner Gnade erzogen werden und sie ihnen weitergeben.“|hab,sheet",
+  "Schon in der Schwangerschaft segnen, später auch morgens und beim Abgeben|emp",
+  "Im Babyalter für das Kind beten; bis 3 Jahre Geschichten und ein kleines Liedrepertoire|emp",
+  "Gebet als sicherer Ort, nicht als Pflicht|inb"]},
+ handy:{t:"Eure Handys",lead:"In den ersten Jahren sind Bildschirme vor allem eine Frage eurer eigenen Gewohnheiten.",pts:[
+  "Kinder konkurrieren ein Leben lang mit Elternbildschirmen - das größte Problem war meist der Papa|tw",
+  "Gerätefreie Stunde vor dem Schlafengehen: Baden, Kuscheln, Abendsegen ohne Handy|tw,sheet",
+  "Handys schlafen außerhalb des Schlafzimmers am zentralen Ladeplatz, Wecker statt Handy|tw",
+  "Morgens nicht zuerst zum Handy greifen|tw,hab",
+  "Kein Handy beim Wickeln, Stillen und Essen|sheet,tw",
+  "Ein Tag pro Woche und eine Woche im Jahr gerätefrei|tw",
+  "Autozeit ist Gesprächszeit, Heimweg als Puffer ohne News|tw,hab"]},
+ draussen:{t:"Jeden Tag nach draußen",lead:"Natur entschleunigt, Kinder wie Eltern.",pts:[
+  "10 Minuten Natur täglich sind 60 Stunden im Jahr|slow",
+  "Tagsüber viel Tageslicht und frische Luft, abends ruhig|sheet,agb",
+  "Ein täglicher Spaziergang oder Trage-Block zur ungefähr gleichen Zeit ist ein guter Anker|sheet",
+  "Draußen darf es dreckig werden; Selbstwirksamkeit entsteht draußen|slow",
+  "Kindheit nicht verplanen: Zeit zum Rumlümmeln und Käferbewundern lassen|slow"]},
+ mahlzeit:{t:"Gemeinsame Mahlzeiten",lead:"Zur gleichen Zeit am gleichen Ort zusammen essen - Earleys Schlüsselgewohnheit am Tisch.",pts:[
+  "Gemeinsame Mahlzeit als Anker, auch wenn das Baby noch nicht mitisst|hab",
+  "Geräte am Tisch weg, für Eltern und Kinder|hab,tw",
+  "Kerze anzünden, Händehalten beim Tischgebet|hab",
+  "Geschichte des Tages: Was erlebt, was besonders, was gelernt?|slow",
+  "„Rose and Thorn“: das Schönste und das Schwerste des Tages|hab",
+  "Unordnung aushalten: „Das ist okay, hilfst du beim Aufwischen?“|hab",
+  "Gäste in den normalen Alltag einladen statt groß zu bewirten|hab,slow"]},
+ mithelfen:{t:"Mithelfen lassen",lead:"„Tief im Kind steckt der Wunsch, in die Arbeit dessen einbezogen zu werden, der es liebt.“",pts:[
+  "Hausarbeit gemeinsam ist langsamer und chaotischer, aber echte gemeinsame Zeit|hab",
+  "„If you do it alone, you'll always do it alone.“|hab",
+  "Was das Kind selbst kann, nicht für es tun|hab",
+  "Im Haushalt mithelfen passt genau zu den Sprüngen 7 und 8|oje",
+  "Kleine Aufträge erst begleiten, nie zwingen|slow",
+  "Earleys Ämtchen mit Belohnung übernehmen wir nicht - passt nicht zu euren Quellen zum Loben|hab,agp"]},
+ dorf:{t:"Euer Dorf",lead:"Unterstützung ist Teil des Konzepts, kein Zeichen von Schwäche.",pts:[
+  "Einen „Dorf“-Moment pro Woche fest einplanen: Besuch, Essen bringen lassen, Hebamme|sheet",
+  "Hilfe konkret und begrenzt erbitten: „die nächsten vier Wochen dienstags Abendessen“|slow,sheet",
+  "Bedürfnisorientiert plus wenig Hilfe von außen ist oft ein Ticket in den Burn-out|agb",
+  "Babysitter und Großeltern früh einbinden - weitere Bezugspersonen sind gut fürs Kind|hab,emp",
+  "Jour fixe: ein fester Termin im Monat, offenes Haus, nichts muss fertig sein|slow"]},
+ essen:{t:"Essen am Familientisch",lead:"Gemeinsam essen, ohne Druck.",pts:[
+  "Ab dem ersten Geburtstag Familienkost; Kuhmilch als Getränk max. ca. 300 ml|kd",
+  "Regelmäßige Mahlzeiten, kein Dauersnacken|kd",
+  "Kein Handy oder Film beim Essen; eine sichere Beilage anbieten|kd,tw",
+  "Nie zwingen, Süßes nicht als Belohnung|kd",
+  "Unter 2 Jahren darf es aufstehen, sobald es satt ist|fam"]}
+};
+
+/* =========================================================
+   SPRÜNGE - Wochen ab errechnetem Termin
+   Punkt: "Text|quellen|thema|anleitung"  (ohne Thema → „sprung“)
+   ========================================================= */
+const LEAPS = [
+ {n:1,name:"Sinneseindrücke",from:4.5,to:5.6,
+  learns:["Die Sinne reifen schnell: schaut und horcht länger, sieht weiter scharf|oje|sinne","Lächelt zum ersten Mal richtig oder öfter|oje","Ist länger wach, die Verdauung wird ruhiger, erste Tränen|oje"],
+  signs:["Weint mehr, will dauernd auf den Arm und schläft allein schlechter|oje","Will häufiger an die Brust - oft zum Trösten. Das heißt nicht, dass die Milch nicht reicht|oje|cluster"],
+  games:["Gesicht nah (20-30 cm) zeigen und lächelnd ansprechen|oje|sinne|Setzt euch bequem hin und bringt euer Gesicht auf 20-30 cm heran. Erzählt einfach vom Alltag und haltet immer wieder inne, damit es mit Lauten „antworten“ kann.","Kontraste und Streifen zeigen: Gitterstäbe vor heller Wand, Bücherrücken|oje|sinne|Beim Herumtragen vor Dingen mit starken Kontrasten stehen bleiben: Streifen, Ecken, kräftige Farben, Gesichter. Scharf sieht es nur bis etwa 30 cm. Wird es ihm langweilig, etwas Ähnliches, aber leicht anderes zeigen."],
+  cope:["Trösten, wann immer es weint - verwöhnen geht in diesem Alter nicht|oje|naehe","Diese Unruhe dauert meist nur Tage bis etwa eine Woche|oje"]},
+ {n:2,name:"Muster",from:7.5,to:9.2,
+  learns:["Entdeckt Hände und Füße, probiert Arm- und Beinhaltungen aus|oje","Macht eigene Laute („ah“, „üh“) und hört ihnen zu|oje|sprache"],
+  signs:["Schreit mehr, fremdelt, klammert, schläft und trinkt schlechter|oje","Ruhiger nur mit Körperkontakt|oje|naehe"],
+  games:["Spielzeug so aufhängen, dass es dagegen schlagen kann|oje|spielen|Ein Spielzeug in Reichweite über ihm aufhängen, sodass es dagegen schlagen und es mit der Hand umschließen kann. Gezielt greifen klappt noch nicht, das Spielzeug muss ihm „zufliegen“. Jeden Versuch begeistert kommentieren.","Seine Laute sofort nachmachen - ein erstes Gespräch|oje|sprache|Sobald es Laute macht, prompt antworten und sie nachmachen, damit es hört, wie es klingt. Am besten bequem hinsetzen, Knie anziehen und das Baby mit dem Gesicht zu euch an die Oberschenkel lehnen. Schaut es weg, Pause machen.","Gemeinsam baden: kleine Wellen, ein Lied|oje|spielen|Baby bäuchlings auf euren Bauch in der Wanne legen und ihm Wassertropfen und Rinnsale zeigen. Oder rücklings auf euren Bauch legen, ein Lied singen und im Takt langsam hin und her schaukeln, sodass kleine Wellen entstehen."],
+  cope:["Schaut es weg oder dreht sich weg, braucht es Pause|oje|spielen","Wenn es „schwierig“ wird: Übt es gerade etwas Neues?|oje"]},
+ {n:3,name:"Fließende Übergänge",from:11,to:12.6,
+  learns:["Bewegungen werden geschmeidig, der Kopf dreht sich flüssig|oje|bauchlage","Lernt bewusst zu schlucken, spielt mit der Stimme|oje|sprache"],
+  signs:["Kurze Phase (1 Tag bis 1 Woche): quengelig, nachts wieder öfter wach|oje"],
+  games:["Nackt strampeln lassen|oje|bauchlage|Wenn es schön warm ist, auf einem großen Badelaken oder einer Decke am Boden. Wer die Aufmerksamkeit auf Hände oder Füße lenken will, bindet ein buntes Band mit Glöckchen darum.","Langsame Wiegespiele wie „Pendeluhr“, Kopf immer gut stützen|oje|spielen|„Pendel an der Uhr“: Baby auf eure Knie setzen und langsam von rechts nach links schwingen, dazu ein hohes, schnelles „Ticktack“ oder ein tiefes, langsames „Bimbam“. Gut festhalten, der Kopf muss problemlos mitschwingen können. Kurz spielen und lieber oft wechseln.","Verschiedene Materialien fühlen lassen|oje|spielen|Beim Wäschezusammenlegen Stoffe in die Hand geben: Wolle, Baumwolle, Frottee, Synthetik, auch mal Fensterleder oder Filz. Mit seiner Hand darüberstreichen, es fühlt mit Fingern und Mund."],
+  cope:["Wird es zu viel: Baby sicher ablegen, durchatmen, Hilfe rufen. Niemals schütteln|oje,sheet|ueberforderung","Der Rückhalt des Partners entspannt die ganze Familie|oje|paar"]},
+ {n:4,name:"Ereignisse",from:14.6,to:19.6,
+  learns:["Greift gezielt, gibt Spielzeug von Hand zu Hand, alles kommt in den Mund|oje","Dreht sich, reagiert auf seinen Namen, versteht erste Wörter|oje|sprache"],
+  signs:["Längste Phase bisher, oft rund fünf Wochen|oje","Trinkt abgelenkt - kein Grund zum Abstillen|oje|cluster","Fremdelt sogar bei Bekannten|oje|fremdeln"],
+  games:["Kuckuck mit einem Tuch, Spiegelspiele|oje|spielen|Kuckuck: Tuch übers Gesicht des Babys legen und fragen „Wo ist …?“. Zieht es nicht selbst, seine Hand nehmen und das Tuch gemeinsam langsam runterziehen, ganz einfach halten. Spiegel: zusammen reinschauen, es pendelt zwischen euch und dem Spiegelbild und lacht, wenn das „echte“ Gesicht spricht.","Reime und Kitzelspiele: „Backe, backe Kuchen“|oje|sprache|„Backe, backe Kuchen“ und Lieder mit Bewegung im Takt, etwa Wiegen oder Tanzen. Kitzelspiel: „Da kommt die Maus …“, die Finger laufen über den Körper, zum Schluss am Ohrläppchen „klingeln“. Oder „Jetzt werd ich dein … (Pause) Näschen packen!“ und die Nase sanft schütteln.","Kurze, betonte Sätze: „Fühl mal, Gras.“|oje|sprache|Sprecht viel über das, was es gerade sieht, hört, schmeckt und fühlt. Kurze, einfache Sätze und das wichtige Wort betonen: „Fühl mal, Gras.“ „Papa kommt.“ „Horch, die Klingel.“"],
+  cope:["Aggressive Gefühle in dieser langen Phase sind nicht unnormal - handeln darf man nicht danach|oje|ueberforderung","Beißen oder Kneifen ruhig mit „Autsch“ quittieren, kein Spiel daraus machen|oje|grenzen"]},
+ {n:5,name:"Zusammenhänge",from:22.6,to:26.6,
+  learns:["Versteht Abstand: Ihr könnt weggehen|oje|trennung","Ursache und Wirkung: fallen lassen, drinnen und draußen|oje","Versteht kurze Sätze und Gesten|oje|sprache"],
+  signs:["Fast alle Babys fremdeln jetzt|oje|fremdeln","Unruhiger Schlaf, isst schlechter|oje","Am stärksten klammern viele um Woche 29|oje|trennung"],
+  games:["Kuckuck und Verstecken hinter der Tür|oje|trennung|Taschentuch über den eigenen Kopf: „Wo ist Mama?“ Zieht es nicht, gemeinsam runterziehen und „Kuckuck!“ rufen. Dann steigern: hinter Zeitung, Sofa, Schrank und schließlich der Tür verstecken, vorher ankündigen und es zusehen lassen. Beim Finden hochnehmen oder schmusen.","Dinge fallen lassen dürfen (Tablett unter dem Hochstuhl)|oje|spielen|Baby in den Hochstuhl, ein Metalltablett auf den Boden und Bauklötze geben, die es gezielt aufs Tablett scheppern lassen darf. Oder Spielzeug an eine kurze Schnur binden und zeigen, wie man es wieder hochzieht.","Kissenberg und Kartontunnel|oje|spielen|Mit Decken und Kissen kleine Hügel zum Drüberkrabbeln bauen, eine große offene Schachtel zum Hineinkriechen hinstellen, aus Kartons und Stühlen einen Tunnel, aus einem Laken ein Zelt. Am schönsten, wenn ihr selbst mitkrabbelt und Kuckuck einbaut."],
+  cope:["Ankündigen, bevor ihr den Raum verlasst; weitersprechen|oje|trennung","Kein Zwang beim Essen|oje,kd|beikost"]},
+ {n:6,name:"Kategorien",from:33,to:37.6,
+  learns:["Ordnet in Gruppen: Tiere, Essen, Menschen|oje","Erkennt sich im Spiegel, ahmt nach, tauscht Rollen|oje","Wird mitfühlender|oje"],
+  signs:["Hängt am Rockzipfel, will sich nicht wickeln lassen|oje"],
+  games:["Kurze Aufträge: „Gib das mal der Mama“|oje|sprache|Bittet es, euch zu geben, was es in der Hand hat, oder etwas zu holen: „Hol deine Zahnbürste.“ Nur so lange spielen, wie es Spaß macht, und euch freuen, wenn es mitmacht.","„Jetzt hab’ ich dich!“ - erstes Fangspiel|oje|spielen|Das erste Fangspiel: Ihr krabbelt weg und zeigt deutlich, dass es euch fangen soll, dann umgekehrt. Hat einer den anderen erwischt: knuddeln oder hoch in die Luft heben.","Bilderbuch mit großen, klaren Bildern|oje|sprache|Auf den Schoß nehmen, es ein Büchlein aussuchen und selbst umblättern lassen. Auf Bilder zeigen und benennen, passende Geräusche machen (Tierlaute) und es ermuntern, Wort oder Geräusch nachzumachen."],
+  cope:["Plötzliche Ängste ernst nehmen, Mitgefühl zeigen|oje,kd|fremdeln","Was es jetzt versteht, dürft ihr erwarten - nicht mehr|oje|grenzen"]},
+ {n:7,name:"Reihenfolgen",from:41.6,to:46.6,
+  learns:["Tut Dinge in einer Abfolge: Schlüssel ins Schloss, Löffel zum Mund|oje","Zeigt auf Dinge und will, dass ihr sie benennt|oje|sprache"],
+  signs:["Oft rund fünf Wochen: launisch, Wickeln wird zum Ringkampf|oje"],
+  games:["Im Haushalt helfen lassen|oje|spielen|Zuschauen lassen, wie ihr kocht, putzt und aufräumt, und erzählen, was ihr tut. Um kleine Hilfe bitten („Reich mir mal …“), ein eigenes Staubtuch geben, beim Backen eine eigene Rührschüssel mit Löffel.","Mithelfen beim Anziehen vor dem Spiegel|oje|spielen|Vor dem Spiegel aus- und anziehen und dabei die Körperteile benennen. Bittet es, Arm oder Bein auszustrecken, wenn Pulli oder Strumpf kommt. Auch Haare bürsten oder Zähne putzen vor dem Spiegel, es macht es dann gern selbst nach.","„Unter welchem Becher liegt es?“|oje|spielen|Spielzeug vor das Kind legen, einen Becher drüberstülpen, einen ähnlichen Becher daneben stellen: „Wo ist es?“ Jeden Suchversuch loben. Zu schwer? Ein Tuch statt Becher, dann sieht man die Form. Später darf es verstecken und ihr sucht."],
+  cope:["Wirkt es widerspenstig, will es meist nur selbst machen|oje|grenzen","Aussprache nicht korrigieren|oje,kd|sprache"]},
+ {n:8,name:"Programme",from:50.6,to:54.6,
+  learns:["Versteht Abläufe: essen, aufräumen, anziehen|oje","Plant selbst - Missverständnisse führen zu Wut|oje|wut"],
+  signs:["Weint schneller, ungeduldig, jähzornig|oje|wut"],
+  games:["Puppe baden, Geschirr spülen, Einkäufe auspacken|oje|spielen|Puppe baden: Schüssel mit lauwarmem Wasser, Waschlappen, Seife, das Handtuch erst am Schluss geben. Spülen: mit Schürze auf einem rutschfesten Stuhl an der Spüle, unzerbrechliches Geschirr, viel Schaum. Einkäufe: Empfindliches vorher wegnehmen, dann Stück für Stück reichen lassen und gemeinsam einräumen.","Fantasiespiele und kurze Geschichten|oje|sprache|Geschichten über Dinge, die es selbst erlebt hat oder liebt (Autos, Tiere, Wasser), höchstens etwa drei Minuten lang. Beim Bilderbuch auch mal das Kind erzählen lassen. Tut es so, als ob (mit einem Baustein „telefonieren“), einfach mitspielen."],
+  cope:["Es kann lernen, kurz Rücksicht zu nehmen|oje|grenzen","Die Kindersendungen aus dem Buch übernehmen wir nicht|tw,kd|bildschirm"]},
+ {n:9,name:"Prinzipien",from:60.6,to:64.6,
+  learns:["Probiert Strategien aus: freundlich, quengelig, Schabernack|oje","Eigener Wille, „meins“, will mitbestimmen|oje|grenzen"],
+  signs:["Viele Wutanfälle|oje|wut"],
+  games:["Rollenspiele: kochen, Puppe füttern|oje|spielen|Töpfe, Holzlöffel und eine Puppe hinlegen und mitspielen: Ihr seid Gast, die Puppe wird gefüttert, gewickelt, ins Bett gebracht. Das Kind gibt den Ablauf vor, ihr spielt nach, was es sich ausdenkt.","Wirklich mithelfen lassen|oje|spielen|Echte Aufgaben statt Beschäftigung: Mahlzeit zubereiten, Tisch decken, Einkaufen. Das dauert länger, aber es lernt viel und fühlt sich groß. Danach gemeinsam etwas Leckeres essen oder trinken."],
+  cope:["Ja-Grenze statt Erklären im Moment|fam|grenzen","Wut begleiten, beim Kind bleiben - keine Klapse|fam,eos,kd|wut"]},
+ {n:10,name:"Systeme",from:70.6,to:75.6,
+  learns:["Versteht „ich“ und „du“ und die Familie als Einheit|oje","Erste kurze Sätze, viel Fantasie|oje|sprache"],
+  signs:["Weinerlich oder „übertrieben lieb“, neue Ängste|oje"],
+  games:["Herumtollen, Seifenblasen, Klettern|oje|spielen|Drinnen auf Kissen und Matratzen, draußen auf Wiese und Spielplatz toben lassen, Seifenblasen pusten und fangen, auf Niedriges klettern. Ihr bleibt in Reichweite, lasst es aber selbst ausprobieren und haltet euch zurück.","Kinderlieder mit Bewegung|oje|sprache|Gegenüber sitzen und singen: „Klatsche ohne Ende in die beiden Hände“ (klatschen), „Mit dem Finger klopfe dreimal auf dem Kopfe“ (klopfen), zum Schluss „Herein!“ und das Kind in die Arme nehmen. Ihr macht vor, es macht nach."],
+  cope:["Werte jetzt vorleben - die Gewissensbildung beginnt|oje,emp,hab|rituale","Neue Ängste ernst nehmen|kd,inb|fremdeln"]}
+];
+
+/* =========================================================
+   ALTERSABSCHNITTE - Lebenswochen ab Geburt
+   ========================================================= */
+const BANDS = [
+ {from:0,to:0,title:"Geburt und erste Tage",
+  learns:["Erkennt eure Stimmen und Mamas Geruch, sieht scharf auf etwa 20 cm|oje|sinne","Sucht selbst die Brust, wenn es auf Mamas Bauch liegt|agb|stillstart","Muss Trinken und Kacken erst lernen|kd|verdauung"],
+  play:["Haut an Haut liegen, anschauen, leise reden|agb,oje|bonding|Baby nur mit Windel auf eure nackte Brust, eine Decke über euch beide. Euer Gesicht etwa 20 cm entfernt, ruhig sprechen - eure Stimmen kennt es schon aus dem Bauch.","Erste Stunde: nicht wiegen oder waschen, U1 auf dem Bauch|agb|bonding|Vorher im Kreißsaal sagen: Das Baby bleibt die erste Stunde auf Mamas Bauch, Messen und Wiegen warten, die U1 geht auf dem Bauch. Beim Kaiserschnitt Haut an Haut mit Papa."],
+  expect:["Kindspech in den ersten 48 Stunden|kd|verdauung","Milcheinschuss nach 2-4 Tagen|agb|stillstart","Nachwehen, Wochenfluss und Sorgen sind normal|agb|wochenbett"],
+  needs:["Ständig Körperkontakt|agb|naehe","Stillen, wann immer es will; anfangs mindestens alle 3 Stunden|agb,kd|stillstart","Eure Ruhe und ein geschützter Raum|agb|bonding"],
+  cope:["Papa ist die Schnittstelle nach außen|agb|papa","Beim Kaiserschnitt: Haut an Haut mit Papa, zusammenbleiben|agb|bonding","Ihr bestimmt Besuch und Nähe|oje,kd|wochenbett"],
+  habits:["Abendsegen vom ersten Abend an: Hand auf Brust oder Kopf, immer derselbe kurze Satz|sheet,hab|segen","Pflege bewusst statt nebenbei: beim Wickeln sprechen, Blickkontakt, kein Handy|sheet,kd|rituale","Elterngebet an der Tür des schlafenden Babys|hab|segen"]},
+ {from:1,to:3,title:"Wochenbett",
+  learns:["Ahmt Gesichtsbewegungen nach, wenn ihr Zeit lasst|oje|sinne","Unterscheidet Stimmen und Situationen|oje|sinne"],
+  play:["Euer Gesicht ist das spannendste Spielzeug|oje|spielen|Wenn es wach und zufrieden ist: nah ran (20-30 cm), langsam den Mund öffnen, die Zunge zeigen, lächeln - und warten. Viele Babys machen Gesichtsbewegungen nach, wenn man ihnen Zeit lässt.","Jeden Pflegeschritt ankündigen und begleiten|kd|sprache|Beim Wickeln und Anziehen erzählen, was ihr tut: „Jetzt zieh ich dir die Windel aus.“ Körperteile benennen („und jetzt der linke Arm“), Blickkontakt halten, kein Handy dabei.","Tragen und die Wohnung zeigen|oje,agb|tragen|In Tuch oder Trage (Gesicht zu euch) oder auf dem Arm durch die Wohnung gehen: an Fenster, Bild oder Pflanze stehen bleiben, benennen und Zeit zum Schauen lassen. Dreht es den Kopf weg, weitergehen oder Pause.","Kurze wache Bauchlage auf eurer Brust|kd|bauchlage|Ihr liegt halb zurückgelehnt, das Baby bäuchlings auf eurer Brust, euer Gesicht vor seinem. Anfangs 20-30 Sekunden, mehrmals am Tag, nur wenn es wach ist."],
+  expect:["Will 10-12 Mal am Tag trinken und ungern abgelegt werden|agk,agb|naehe","Abends Clusterfeeding|kd,agb|cluster","Seltener Stuhl kann bei Vollgestillten normal sein|kd|verdauung"],
+  needs:["Nähe und Tragen|kd,oje|naehe","Stillen nach Bedarf, kein Wasser oder Tee|kd|stillstart","Sicherer Schlaf im Beistellbett|kd,sheet|schlafsicher"],
+  cope:["Hungerzeichen früh erkennen|agb,agk|hunger","Papa übernimmt beim Stillen den Rest|agb,sheet|papa","Nacht aufteilen, z. B. Papa 22-3 Uhr alles außer Stillen|agb|paar","Besuch bringt Essen mit|agk,kd|wochenbett","Babyblues ernst nehmen, auch bei Vätern|agb,kd|wochenbett"],
+  habits:["Begrüßungsritual nach jedem Aufwachen: Blick, ruhige Stimme, Name|sheet|rituale","Gerätefreie Stunde vor dem längsten Schlafblock, Handys schlafen am Ladeplatz außerhalb des Schlafzimmers|tw,sheet|handy","Ein Moment zu zweit am Tag, und sei es 10 Minuten Kaffee|sheet,hab|paar","Einen „Dorf“-Moment pro Woche fest einplanen|sheet,slow|dorf"]},
+ {from:4,to:7,title:"Erster Monat geschafft",
+  learns:["Erstes echtes Lächeln, meist um Woche 5-6|oje|sinne","Bleibt länger wach und schaut sich um|oje|sinne"],
+  play:["Lächeln, Grimassen, nachmachen|oje|spielen|Lächelt es euch an, zurücklächeln und ansprechen, so merkt es, dass sein Lächeln etwas bewirkt. Grimassen langsam machen und Pausen lassen, damit es nachmachen kann. Schaut es weg, braucht es Pause.","Lieder singen statt Musik vom Band|tw,sheet|rituale|Ein festes Morgenlied, ein Schlaflied und Lieder beim Wickeln, immer dieselben. Ihr müsst nicht gut singen, das Baby liebt eure Stimme.","Babymassage, wenn es gut gelaunt ist|oje|naehe|Nur wenn es wach und zufrieden ist, gut vor dem Nachmittagstief: warmer Raum, warme Hände, Bauch sanft im Uhrzeigersinn, dann Arme und Beine. Dreht es sich weg oder weint, aufhören."],
+  expect:["Das Weinen nimmt oft bis Woche 6-8 zu, besonders abends|agb,agp|schreien","Nach ruhigen ersten Wochen werden Schlafabstände oft kürzer|agb|einschlafen"],
+  needs:["Körperkontakt bleibt das Wichtigste|sheet,agp|naehe","Tageslicht und frische Luft, abends ruhig|sheet,agb|einschlafen"],
+  cope:["Weinen begleiten statt abstellen; Treppensteigen mit Tuch|fam|schreien","Seglertrick: nur auf 80 % fahren|agb|paar","Eigene Pause tagsüber nehmen|fam|paar"],
+  habits:["Feste Abendfolge: Abwischen oder Baden, Licht dimmen, Lied, Segen|sheet,tw|rituale","Väter-Ritual: eine feste Aufgabe allein mit dem Kind, z. B. die erste Wickelrunde am Morgen|sheet,emp|papa","Täglicher Spaziergang oder Trage-Block zur ungefähr gleichen Zeit|sheet,slow|draussen","Wöchentliches Foto am gleichen Ort plus ein Satz, was neu war|sheet|rituale"]},
+ {from:8,to:12,title:"Zweiter und dritter Monat",
+  learns:["Entdeckt seine Hände, brabbelt, hält den Kopf zunehmend|oje|bauchlage","Schaut euch lange an|oje|sinne"],
+  play:["Gespräche mit Pausen - es antwortet|oje,kd|sprache|Bequem hinsetzen, Knie anziehen und das Baby mit dem Gesicht zu euch an die Oberschenkel lehnen. Erzählen, was euch einfällt - wichtig sind Stimme und Mimik, nicht der Inhalt. Pausen lassen, damit es „antwortet“, und aufhören, wenn es genug hat.","Spielzeug zum Dagegenschlagen|oje|spielen|Spielzeug in Reichweite über ihm aufhängen, damit es dagegen schlagen und es festhalten üben kann. Auch mal langsam vor und zurück bewegen und schauen, wie weit es den Blick noch mitgehen lässt.","Bauchlage mit eurem Gesicht davor|kd|bauchlage|Baby wach auf eine Decke auf den Bauch legen, ihr legt euch flach davor auf Augenhöhe und redet oder singt. So lange es mag, dann umdrehen."],
+  expect:["Schreigipfel um Woche 10-14 durch Gehirnentwicklung|fam,agb|schreien","Schreibaby-Faustregel kennen|kd,agb|schreien"],
+  needs:["Prompte Reaktion|fam|naehe","Täglich eine halbe Stunde exklusiv mit jedem von euch|fam|naehe"],
+  cope:["Papa-Bindung tagsüber aufbauen statt nachts erzwingen|fam|papa","„Das Tragen ist das Stillen der Väter“|agb|tragen","Paarzeit fest einplanen|emp,agb|paar"],
+  habits:["Ein Morgen- und ein Schlaflied, immer dieselben|tw,sheet|rituale","Morgens erst Stille oder ein kurzes Gebet, dann das Handy|hab,tw|handy","Date Night pro Woche, meist zuhause nach dem Zubettbringen, Handys weg|hab,emp|paar"]},
+ {from:13,to:17,title:"Vierter Monat",
+  learns:["Greift gezielter, Hände und Mund erkunden alles|oje|spielen","Lacht laut, reagiert auf Stimmen|oje|sprache"],
+  play:["Rassel, knisterndes Papier, Stoffbuch|oje|spielen|Dinge reichen, die es greifen, von Hand zu Hand geben und in den Mund stecken darf: Rassel, Papier zum Knistern, Stoffbuch, Spielsachen, die sanft piepsen. Nichts so Kleines, dass es verschluckt werden kann.","Spiegel und Kuckuck|oje|spielen|Kuckuck: Tuch übers Gesicht, „Wo ist …?“, und notfalls gemeinsam langsam runterziehen. Spiegel: zusammen reinschauen und das Spiegelbild ansprechen, es schaut zwischen euch und dem Spiegel hin und her.","Viel Bodenzeit statt Wippe|kd|bauchlage|Auf einer Decke am Boden liegen lassen, ein Spielzeug knapp außer Reichweite, damit es sich streckt und dreht. Wippe und Babysitz nur kurz."],
+  expect:["Sprung 4 kündigt sich oft schon ab Woche 15 an|oje|sprung","Schlaf kann wieder unruhiger werden|kd,agb|einschlafen"],
+  needs:["Hilfe beim Einschlafen|agb|einschlafen","Müdigkeitszeichen ernst nehmen|kd,agb|einschlafen"],
+  cope:["Kein Schlaftraining|kd,agb|schlaftraining","Bei Dauererschöpfung eine Stunde gute Beratung|fam|ueberforderung"],
+  habits:["Bade-Ritual an festem Wochentag, immer gleiche Reihenfolge; Wasser langsam übers Gesicht gewöhnen|sheet,slow|rituale","Übergabe-Satz beim Gehen und Kommen: „Ich geh kurz, bin gleich wieder da.“|sheet|trennung","Parenting-Check-in bei der Date Night: Was läuft gut, was ist schwer, wobei brauchst du Hilfe?|hab|paar","Positionscheck: Ist Papa inzwischen genauso routiniert wie Mama?|emp,sheet|papa"]},
+ {from:18,to:25,title:"Fünfter und sechster Monat",
+  learns:["Dreht sich, stützt sich auf, interessiert sich für euer Essen|oje,kd|beikost","Versteht erste Wörter|oje|sprache"],
+  play:["Alltagsgegenstände: Löffel, Becher, Dose|fam,oje|spielen|Holzlöffel, Plastikbecher, Topf mit Deckel, leere Schachteln und Eierkartons, durchsichtige Fläschchen mit etwas drin (gut verschlossen). Es darf klopfen, schütteln, ein- und ausräumen.","Bücher gemeinsam anschauen|kd|sprache|Auf den Schoß nehmen, ein Buch mit großen, klaren Bildern. Zeigen und benennen, Geräusche dazu machen, es umblättern lassen - auch Knabbern am Buch ist erlaubt.","Gemeinsam baden oder Babyschwimmen|oje|spielen|In der Wanne Schaum machen und ein Spielzeug darunter verstecken, mit einem Strohhalm in den Schaum pusten und es nachmachen lassen. Babyschwimmen: Bad mit warmem Babybecken oder festen Babyschwimmzeiten suchen."],
+  expect:["Beikost-Reifezeichen tauchen auf|kd|beikost","Es dreht sich - Wohnung wird Thema|kd,fam|kindersicher"],
+  needs:["Hochstuhl erst, wenn es sicher sitzt|kd|beikost","Allergene früh, Gluten im 5.-7. Monat|kd|allergene","Viel Nähe vor Sprung 5|oje|trennung"],
+  cope:["Gläschen sind okay|kd|beikost","Nicht hinsetzen, bevor es selbst sitzt|kd,oje|bauchlage"],
+  habits:["Baby sitzt bei den Mahlzeiten mit am Tisch, gleiche Zeit, gleicher Ort|hab|mahlzeit","Handys am Tisch weg, für alle|hab,tw|mahlzeit","Jeden Tag mindestens 10 Minuten Natur|slow|draussen"]},
+ {from:26,to:34,title:"Sechster bis achter Monat",
+  learns:["Robbt, krabbelt, sitzt - im eigenen Tempo|oje,kd|bauchlage","Ursache und Wirkung, Verschwinden und Wiederfinden|oje|trennung"],
+  play:["Ausräum-Schublade mit Ungefährlichem|fam|kindersicher|Eine Schublade oder ein Schränkchen auf seiner Höhe mit Dingen füllen, die es ausräumen darf: Plastikdosen, Holzlöffel, Topflappen, Schachteln. Den Rest kindersicher machen - eine Ja-Umgebung statt Dauer-Nein.","Kartontunnel, Kissenberg, Bälle|oje|spielen|Aus Kartons und Stühlen einen Tunnel bauen, mit Kissen und Decken Hügel zum Drüberkrabbeln, ein Laken als Zelt. Dazu ein leichter Ball, der von allein rollt. Am schönsten, wenn ihr mitkrabbelt.","Draußen: Gras, Sand, Blätter|agb,slow|spielen|Auf einer Decke oder barfuß ins Gras, Sand und Wasser mit kleiner Schaufel, Blätter rascheln lassen, Tiere beobachten (Enten, Streichelzoo). Dreckig werden ist erlaubt, schon ein paar Minuten täglich zählen."],
+  expect:["Erste Zähne kommen oft um 6 Monate|kd,oje|zaehne","Trennungsangst um Woche 29 am stärksten|oje|trennung"],
+  needs:["Ab etwa 6 Monaten Fleisch im Brei|kd|beikost","Wasser aus dem Becher, sobald drei Breimahlzeiten laufen|kd|beikost"],
+  cope:["Probleme organisatorisch lösen statt Dauer-Nein|fam,kd|kindersicher","„Stopp“ statt „Nein“|fam|kindersicher"],
+  habits:["Tischgebet mit Händehalten, eine Kerze anzünden|hab|mahlzeit","Ab dem ersten Zahn zweimal täglich Zähneputzen als festes Ritual|kd|zaehne","Eine feste tägliche Vorlesezeit mit Bilderbuch|hab,kd|sprache"]},
+ {from:35,to:43,title:"Achter bis zehnter Monat",
+  learns:["Ordnet die Welt in Gruppen, erkennt sich im Spiegel|oje|sprung","Fremdelt - ein wichtiger Schritt|kd,fam|fremdeln"],
+  play:["Kurze Aufträge, Geben und Nehmen, Verstecken|oje|spielen|Etwas geben lassen („Gib das mal der Mama“) und zurückgeben, kleine Dinge holen lassen. Verstecken: erst hinter einer Zeitung oder dem Sofa, später hinter der Tür, vorher ankündigen und beim Finden schmusen.","Bilderbücher, Reime, Lieder mit Gesten|oje,kd|sprache|Auf den Schoß nehmen und „Backe, backe Kuchen“ singen: seine Händchen nehmen, bei jeder Silbe zusammenklatschen, bei „Soooo groß“ beide Arme hoch. Bilderbücher: zeigen, benennen, Geräusche machen."],
+  expect:["Fremdeln, oft stärker bei Männern|kd,fam|fremdeln","Teilen gelingt noch nicht|emp,fam|grenzen"],
+  needs:["Eine sichere Basis zum Erkunden|oje,inb|naehe","Fremde nähern sich langsam|fam|fremdeln"],
+  cope:["Großeltern das Fremdeln erklären|fam|fremdeln","Kommentare gelassen nehmen|fam|umfeld"],
+  habits:["Täglich eine halbe Stunde exklusiv mit dem Kind, ohne Handy - das Kind bestimmt das Spiel|fam,emp|naehe","Abschieds-Ritual beim Abgeben bei Oma oder Babysitter, mit Segen|sheet,emp|trennung","Ein Tag pro Woche gerätefrei: raus, zusammen backen, Gäste|tw|handy"]},
+ {from:44,to:52,title:"Zehnter bis zwölfter Monat",
+  learns:["Steht, läuft an Möbeln entlang|oje,kd|laufen","Erste Wörter um den ersten Geburtstag|kd|sprache"],
+  play:["Mithelfen, Löffel selbst halten|oje|spielen|Beim Essen einen eigenen Löffel oder eine kleine Gabel geben, Brot- und Obststückchen zum Aufspießen, eine große Plastikunterlage unter den Stuhl. Beim Kochen und Aufräumen zuschauen und kleine Handgriffe machen lassen.","Lieder mit Bewegung, Klatschspiele|oje|sprache|Gegenüber sitzen, „Klatsche ohne Ende in die beiden Hände“ singen und klatschen, „Mit dem Finger klopfe dreimal auf dem Kopfe“ klopfen, zum Schluss in die Arme nehmen. Ihr macht vor, es macht nach."],
+  expect:["Will viel „selbst“ - Frust, wenn es nicht klappt|oje|grenzen","Bald Familientisch|kd|essen"],
+  needs:["Anreize zum Laufen, kein Gehfrei|kd|laufen","Barfuß oder Antirutschsocken|kd|laufen"],
+  cope:["Richtig wiederholen statt korrigieren|kd|sprache","Grenzen konkret und ohne Manipulation|emp,fam|grenzen"],
+  habits:["Mithelfen lassen: Wäsche, Tisch decken, aufräumen - auch wenn es länger dauert|hab,oje|mithelfen","Familientisch vorbereiten: Kind isst bald mit, was ihr esst|hab,kd|mahlzeit","Nach einem Streit vor dem Kind auch vor ihm versöhnen|emp,hab|paar"]},
+ {from:53,to:65,title:"Das erste Jahr ist geschafft",
+  learns:["Versteht Abläufe, plant, ahmt nach|oje|spielen","Versteht viel mehr, als es sagt|kd,oje|sprache"],
+  play:["Puppe baden, Geschirr spülen, Einkäufe auspacken|oje|spielen|Puppe baden: Schüssel mit lauwarmem Wasser, Waschlappen, Seife, das Handtuch erst am Schluss geben. Spülen: mit Schürze auf einem rutschfesten Stuhl an der Spüle, unzerbrechliches Geschirr, viel Schaum. Einkäufe: Empfindliches vorher wegnehmen, dann Stück für Stück reichen lassen und gemeinsam einräumen.","Viel draußen und mit anderen Kindern|slow,agb|spielen|Jeden Tag raus: Spielplatz, Wald, Wiese. Treffen mit anderen Familien fest einplanen, z. B. einen festen Termin im Monat. In diesem Alter spielen Kinder oft nebeneinander, Teilen muss noch nicht klappen."],
+  expect:["Wutanfälle aus Ohnmacht|oje,fam|wut","Bis 16 Monate laufen etwa 90 %|kd|laufen"],
+  needs:["Viele Dinge selbst entscheiden dürfen|fam|grenzen","Regelmäßige Mahlzeiten, kein Dauersnacken|kd|essen"],
+  cope:["Ja-Grenze statt Erklären|fam|grenzen","Spielerisch statt Machtkampf|fam,eos|grenzen","Beim Kind bleiben, wenn ihr nur sauer seid|fam|ueberforderung"],
+  habits:["Geschichte des Tages beim Abendessen: Was erlebt, was besonders, was gelernt?|slow,hab|mahlzeit","Beim Verschütten: „Das ist okay, hilfst du beim Aufwischen?“|hab|mahlzeit","Euch selbst entschuldigen, wenn ihr laut wurdet - Versöhnung vorleben|hab,emp|grenzen","Kein Fernseher als Mitte des Wohnzimmers; Bücher, Musik, Basteltisch|tw|bildschirm"]},
+ {from:66,to:90,title:"Kleinkind (15 bis 20 Monate)",
+  learns:["Eigener Wille, „meins“, verhandeln|oje|grenzen","Ich und du, erste Zwei-Wort-Sätze|oje,kd|sprache"],
+  play:["Rollenspiele, Herumtollen, Klettern|oje|spielen|Kochen mit Töpfen und Holzlöffel, Puppe füttern und ins Bett bringen - ihr spielt mit, das Kind bestimmt. Dazu toben auf Kissen und Matratzen und klettern auf Niedriges, ihr bleibt in Reichweite.","Bücher, Reime, Lieder - keine Bildschirme|kd,tw|bildschirm|Täglich vorlesen und Bilderbücher anschauen, das Kind auch selbst erzählen lassen. Reime und Lieder mit Bewegung statt Kindersendungen."],
+  expect:["Viele Wutanfälle|fam|wut","Läuft es mit 20 Monaten nicht frei: Kinderarzt|kd|laufen"],
+  needs:["Beständig statt konsequent, logische Folgen statt Strafen|kd|grenzen","Trösten statt Ablenken|kd|naehe"],
+  cope:["Das Kind trösten, das am meisten Beruhigung braucht|fam|wut","Würden wir unseren Partner so behandeln?|fam|grenzen"],
+  habits:["Abendsegen in der Augen-Version, sobald es antworten kann|hab|segen","Gutenachtgeschichte und Abendlied; Tag kurz Revue passieren lassen|emp,slow|rituale","Autofahrten ohne Bildschirm: Lied, Gespräch oder Ruhe|tw,hab|handy","Mithelfen im Haushalt als Normalfall, kein Ämtchen-Lohn|hab|mithelfen"]}
+];
+
+/* =========================================================
+   TERMINE - Lebenswochen ab Geburt
+   ========================================================= */
+const EVENTS = [
+ {from:0,to:0,t:"U1 und U2",d:"U1 nach der Geburt, U2 am 3.-10. Tag mit Neugeborenen- und Hörscreening.",s:"kd,allg",topic:"uterm"},
+ {from:0,to:1,t:"Vitamin D und Fluorid starten",d:"Laut KidsDoc ab der ersten Woche täglich - mit dem Kinderarzt klären.",s:"kd",topic:"vitd"},
+ {from:2,to:12,t:"Stuhlfarbe im Blick",d:"Sehr heller, entfärbter Stuhl: sofort zum Kinderarzt.",s:"kd",topic:"verdauung"},
+ {from:3,to:5,t:"U3 beim Kinderarzt",d:"Etwa 4.-5. Lebenswoche. U-Heft, Karte und Impfpass mitnehmen.",s:"kd,allg",topic:"uterm"},
+ {from:6,to:8,t:"Impfgespräch",d:"Die ersten Impfungen beginnen meist ab etwa 2 Monaten.",s:"allg",topic:"uterm"},
+ {from:12,to:17,t:"U4 vereinbaren",d:"Etwa mit 3-4 Monaten.",s:"allg",topic:"uterm"},
+ {from:17,to:26,t:"Beikost-Fenster",d:"Frühestens Beginn 5., spätestens Beginn 7. Monat - das Kind zeigt, wann.",s:"kd",topic:"beikost"},
+ {from:18,to:30,t:"Wohnung kindersicher machen",d:"Sobald es sich dreht.",s:"kd,fam",topic:"kindersicher"},
+ {from:24,to:30,t:"U5 vereinbaren",d:"Etwa mit 6-7 Monaten.",s:"allg",topic:"uterm"},
+ {from:24,to:40,t:"Erster Zahn? Putzen starten",d:"Ab dem ersten Zahn zweimal täglich.",s:"kd",topic:"zaehne"},
+ {from:43,to:52,t:"U6 vereinbaren",d:"Etwa mit 10-12 Monaten.",s:"allg",topic:"uterm"},
+ {from:52,to:53,t:"Erster Geburtstag",d:"Familientisch; Kuhmilch als Getränk max. ca. 300 ml; Honig erst jetzt.",s:"kd",topic:"essen"},
+ {from:86,to:90,t:"Laufen mit 20 Monaten?",d:"Läuft es noch nicht frei, beim Kinderarzt ansprechen.",s:"kd",topic:"laufen"}
+];
+
+/* =========================================================
+   ZUSTAND
+   ========================================================= */
+const DAY=864e5, MAXW=90;
+const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
+const VERSION="1.0";
+
+/* Gemeinsamer Stand S: daten/et, daten/birth als {v,ts}; notizen/w<Woche> als {t,ts}.
+   Jeder Eintrag trägt seinen Zeitstempel, beim Abgleich gewinnt pro Eintrag der jüngere.
+   Leere Notizen bleiben als {t:"",ts} stehen statt gelöscht zu werden, so kommt das
+   Leeren auch auf dem anderen Gerät an und es braucht keine Grabsteine. */
+const S=store.get("S",null)||(()=>{
+  // Erster Start dieser Fassung: alte Einzelschlüssel übernehmen. ts:1 = älter als jede echte Änderung.
+  const s={daten:{},notizen:{}}, et=store.get("et",null), bi=store.get("birth",""), n=store.get("notes",{});
+  if(et) s.daten.et={v:et,ts:1};
+  if(bi) s.daten.birth={v:bi,ts:1};
+  Object.keys(n).forEach(k=>{ if(String(n[k]).trim()) s.notizen["w"+k]={t:n[k],ts:1}; });
+  store.set("S",s); return s;
+})();
+const wert=p=>{const [a,b]=p.split("/"); return S[a]&&S[a][b]};
+const notiz=w=>(wert("notizen/w"+w)||{}).t||"";
+const alleNotizen=()=>Object.entries(S.notizen||{}).map(([k,v])=>[+k.slice(1),(v&&v.t)||""]).filter(([k,t])=>t.trim());
+const state={tab:"woche",et:(wert("daten/et")||{}).v||"2026-10-28",birth:(wert("daten/birth")||{}).v||"",week:null};
+
+/* ---------- Sync über Firebase (REST, kein SDK) ----------
+   Gleiches Vorgehen wie Brain und Küchenplan: haushalte/<code>/..., Regeln unverändert.
+   Geschrieben wird immer nur der einzelne Eintrag, nie eine ganze Sammlung. */
+const cfg=store.get("sync",{db:"",hid:""});
+const queue=store.get("q",{});
+const basis=()=>cfg.db&&cfg.hid?cfg.db.replace(/\/$/,"")+"/haushalte/"+cfg.hid:null;
+let es=null, syncState="lokal", versuche=0, wiederTimer=null, flushTimer=null, sendet=false, renderWartet=false;
+const SYNCTEXT={lokal:"nur auf diesem Gerät",verbindet:"verbindet …",live:"verbunden - Änderungen kommen sofort an",
+  getrennt:"gerade keine Verbindung - Änderungen werden nachgeschickt",verweigert:"Firebase verweigert den Zugriff - Datenbank-URL und Code prüfen"};
+const ts=v=>v&&typeof v==="object"?+v.ts||0:-1;
+
+function lokalSetzen(p,v){const [a,b]=p.split("/"); S[a]=S[a]||{}; if(v===null) delete S[a][b]; else S[a][b]=v;}
+function setzen(p,v){ lokalSetzen(p,v); store.set("S",S); queue[p]=v; store.set("q",queue); clearTimeout(flushTimer); flushTimer=setTimeout(flush,700); }
+async function flush(){
+  clearTimeout(flushTimer);
+  if(!basis()||sendet||syncState==="verweigert") return;
+  const keys=Object.keys(queue); if(!keys.length) return;
+  sendet=true; let ok=true;
+  for(const p of keys){
+    const v=queue[p];
+    try{
+      const r=await fetch(basis()+"/"+p+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(v)});
+      if(r.ok){ if(queue[p]===v) delete queue[p]; }
+      else { ok=false; if(r.status===401||r.status===403) zustand("verweigert"); break; }
+    }catch(e){ ok=false; break; }
+  }
+  store.set("q",queue); sendet=false; statusZeigen();
+  if(ok&&Object.keys(queue).length) flush();
+}
+/* Neuer Stand von außen: Ansicht nur neu zeichnen, wenn gerade niemand tippt */
+function uebernehmen(){
+  store.set("S",S);
+  state.et=(wert("daten/et")||{}).v||state.et; state.birth=(wert("daten/birth")||{}).v||"";
+  const a=document.activeElement;
+  if(a&&/INPUT|TEXTAREA/.test(a.tagName)&&document.getElementById("view").contains(a)){ renderWartet=true; return; }
+  render();
+}
+document.addEventListener("focusout",()=>setTimeout(()=>{ const a=document.activeElement;
+  if(renderWartet&&!(a&&/INPUT|TEXTAREA/.test(a.tagName))){ renderWartet=false; render(); } },0));
+
+function zusammenfuehren(fern){
+  fern=fern&&typeof fern==="object"?fern:{}; let neu=false;
+  ["daten","notizen"].forEach(f=>{
+    const l=S[f]||{}, r=(fern[f]&&typeof fern[f]==="object")?fern[f]:{};
+    new Set([...Object.keys(l),...Object.keys(r)]).forEach(k=>{
+      const tl=ts(l[k]), tr=ts(r[k]);
+      if(tr>tl){ lokalSetzen(f+"/"+k,r[k]); neu=true; }
+      else if(tl>tr) queue[f+"/"+k]=l[k];   // kennt die Gegenseite noch nicht
+    });
+  });
+  store.set("q",queue); flush();
+  if(neu) uebernehmen();
+}
+function eintragRein(p,v){
+  const t=p.split("/").filter(Boolean);
+  if(t.length===2&&(t[0]==="daten"||t[0]==="notizen")){
+    if(v===null){ if(wert(p)){ lokalSetzen(t.join("/"),null); return true; } return false; }
+    if(ts(v)>ts(wert(t.join("/")))){ lokalSetzen(t.join("/"),v); return true; }
+  }else if(t.length===1&&v&&typeof v==="object"){
+    let neu=false; Object.entries(v).forEach(([k,x])=>{ if(eintragRein(t[0]+"/"+k,x)) neu=true; }); return neu;
+  }
+  return false;
+}
+function zustand(z){ syncState=z; statusZeigen(); }
+function statusZeigen(){
+  const el=document.getElementById("syncStatus"); if(!el) return;
+  const n=Object.keys(queue).length;
+  el.textContent=(basis()?SYNCTEXT[syncState]:SYNCTEXT.lokal)+(basis()&&n?` · ${n===1?"1 Änderung wartet":n+" Änderungen warten"}`:"");
+}
+function verbinden(){
+  if(es){try{es.close();}catch(e){} es=null;}
+  clearTimeout(wiederTimer);
+  if(!basis()){ zustand("lokal"); return; }
+  zustand("verbindet");
+  try{
+    es=new EventSource(basis()+".json");
+    es.addEventListener("put",e=>{
+      let d; try{ d=JSON.parse(e.data); }catch(err){ return; }
+      if(!d||typeof d!=="object") return;
+      if(d.path==="/"||d.path===""){ zusammenfuehren(d.data); return; }
+      if(eintragRein(d.path,d.data)) uebernehmen();
+    });
+    es.addEventListener("patch",e=>{
+      let d; try{ d=JSON.parse(e.data); }catch(err){ return; }
+      if(!d||typeof d!=="object") return;
+      let neu=false; Object.entries(d.data||{}).forEach(([k,v])=>{ if(eintragRein((d.path==="/"?"":d.path)+"/"+k,v)) neu=true; });
+      if(neu) uebernehmen();
+    });
+    es.addEventListener("keep-alive",()=>{ if(syncState!=="live") zustand("live"); });
+    // Abgelehnte Regeln meldet Firebase über eigene Ereignisse, nicht über einen Fehler
+    const verweigert=()=>{ zustand("verweigert"); try{es.close();}catch(err){} es=null; };
+    es.addEventListener("cancel",verweigert); es.addEventListener("auth_revoked",verweigert);
+    es.onopen=()=>{ versuche=0; zustand("live"); flush(); };
+    es.onerror=()=>{ if(syncState==="verweigert") return; zustand("getrennt"); neuVerbinden(); };
+  }catch(e){ zustand("getrennt"); neuVerbinden(); }
+}
+function neuVerbinden(){
+  clearTimeout(wiederTimer);
+  if(syncState==="verweigert") return;
+  if(es){try{es.close();}catch(e){} es=null;}
+  wiederTimer=setTimeout(()=>{ if(basis()&&syncState!=="live") verbinden(); },Math.min(30000,1000*Math.pow(2,Math.min(versuche++,5))));
+}
+// Nach Ruhezustand oder Funkloch ist die Verbindung meist tot
+function syncPruefen(){ if(!basis()||syncState==="verweigert") return; flush(); if(syncState!=="live"&&syncState!=="verbindet"){ versuche=0; verbinden(); } }
+addEventListener("online",()=>{ versuche=0; syncPruefen(); });
+addEventListener("offline",()=>{ if(syncState==="live") zustand("getrennt"); });
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") syncPruefen(); });
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
+const birthDate=()=>state.birth?parse(state.birth):parse(state.et);
+const offsetWeeks=()=>(birthDate()-parse(state.et))/DAY/7;
+const ageWeekNow=()=>Math.floor((today()-birthDate())/DAY/7);
+const clampW=w=>Math.max(0,Math.min(MAXW,w));
+const fmt=d=>d.toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"});
+const fmtS=d=>d.toLocaleDateString("de-DE",{day:"numeric",month:"short"});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function leapState(w){
+  const e=w+0.5+offsetWeeks();
+  for(const L of LEAPS) if(e>=L.from&&e<=L.to) return {kind:"storm",leap:L,next:L};
+  let last=null; for(const L of LEAPS) if(e>L.to) last=L;
+  const next=LEAPS.find(L=>L.from>e)||null;
+  if(last&&e-last.to<=3) return {kind:"sun",leap:last,next};
+  return {kind:"calm",leap:last,next};
+}
+const bandOf=w=>BANDS.find(b=>w>=b.from&&w<=b.to)||BANDS[BANDS.length-1];
+const eventsOf=w=>EVENTS.filter(e=>w>=e.from&&w<=e.to);
+
+/* =========================================================
+   GRAFIK
+   ========================================================= */
+const ICON={
+ storm:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 15a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.3 1.5A3.8 3.8 0 0 1 17.5 15z" opacity=".8"/><path fill="currentColor" d="M12 15l-2 4h2.5l-1.5 4 4.5-6h-2.6l1.6-2z"/></svg>`,
+ sun:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>`,
+ calm:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".55" d="M7 17a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.4 1.4A3.4 3.4 0 0 1 16.5 17z"/></svg>`,
+ left:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>`,
+ right:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`,
+ q1:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>`,
+ q2:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/><rect x="8" y="3" width="8" height="8" rx="2"/></svg>`,
+ q3:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3"/><path d="M9 2v1.5M2 9h1.5M4 4l1 1M14 4l-1 1"/><path d="M8 20a4 4 0 0 1-.4-8 5 5 0 0 1 9.5 1.3A3.3 3.3 0 0 1 16.8 20z"/></svg>`,
+ q4:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z"/></svg>`,
+ q5:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="7" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.2-6 5-6s5 2.7 5 6M13 20c0-2.6 1.6-4.6 3.5-4.6S20 17.4 20 20"/></svg>`,
+ q6:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg>`,
+ cal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>`,
+ tip:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.4 5 5.6.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.6-.8z"/></svg>`
+};
+function skyArt(kind){
+  const cloud=(x,y,s,o)=>`<g transform="translate(${x} ${y}) scale(${s})" opacity="${o}"><path fill="var(--cloud)" d="M10 30a10 10 0 0 1 1-20 14 14 0 0 1 26 4 9 9 0 0 1 1 18H10z"/></g>`;
+  if(kind==="storm") return `<svg class="art" viewBox="0 0 150 110" aria-hidden="true">${cloud(50,10,1.6,1)}<path d="M88 64l-8 16h9l-6 16 18-22h-10l6-10z" fill="var(--storm)"/><g fill="var(--storm)" opacity=".6"><circle cx="70" cy="80" r="2.5"/><circle cx="112" cy="84" r="2.5"/><circle cx="96" cy="100" r="2"/></g></svg>`;
+  if(kind==="sun") return `<svg class="art" viewBox="0 0 150 110" aria-hidden="true"><circle cx="102" cy="40" r="22" fill="var(--sun)"/><g stroke="var(--sun)" stroke-width="4" stroke-linecap="round"><path d="M102 6v8M102 66v8M68 40h8M128 40h8M78 16l6 6M120 58l6 6M78 64l6-6M120 22l6-6"/></g>${cloud(30,52,1.2,1)}</svg>`;
+  return `<svg class="art" viewBox="0 0 150 110" aria-hidden="true"><circle cx="112" cy="30" r="14" fill="var(--q3)" opacity=".85"/>${cloud(40,30,1.4,1)}${cloud(10,62,.9,.8)}<g fill="var(--q3)"><path d="M30 20l2 4 4 .6-3 2.8.8 4.2L30 29.6 26.2 31.6l.8-4.2-3-2.8 4-.6z" opacity=".7"/></g></svg>`;
+}
+
+/* =========================================================
+   ANSICHTEN
+   ========================================================= */
+let ITEMS=[]; // für Info-Blätter
+function parseItem(str,defTopic){const p=str.split("|");return {text:p[0],srcs:(p[1]||"").split(",").filter(Boolean),topic:p[2]||defTopic||null,how:p[3]||""};}
+const tags=srcs=>`<span class="src">${srcs.map(k=>SRC[k]?`<i title="${esc(SRC[k].t)}">${SRC[k].k}</i>`:"").join("")}</span>`;
+function li(str,qcls,isLeap,def){
+  const it=parseItem(str,isLeap?"sprung":def); it.q=qcls; it.leap=isLeap; const id=ITEMS.push(it)-1;
+  return `<li class="${isLeap?"leap":""}"><span class="dot"></span><span class="t">${isLeap?`<span class="tag">Sprung</span>`:""}${esc(it.text)}${tags(it.srcs)}${it.how?`<span class="how"><b>So geht's:</b> ${esc(it.how)}</span>`:""}</span>${it.topic?`<button class="info" data-item="${id}" aria-label="Mehr dazu: ${esc(it.text)}">i</button>`:"<span></span>"}</li>`;
+}
+const QUESTIONS=[
+ {id:"q1",title:"Was lernt es?"},{id:"q2",title:"Welche Spiele und Aktivitäten sind gut?"},
+ {id:"q3",title:"Was können wir erwarten?"},{id:"q4",title:"Was braucht es?"},{id:"q5",title:"Wie können wir damit umgehen?"},
+ {id:"q6",title:"Welche Gewohnheiten starten wir jetzt?"}];
+const SHORT={q1:"Lernt",q2:"Spielen",q3:"Erwarten",q4:"Braucht",q5:"Umgang",q6:"Gewohnheiten"};
+
+function ageLabel(w){
+  if(w<=0) return "Erste Lebenswoche";
+  const m=Math.floor(w/4.345),r=Math.round(w-m*4.345);
+  if(m<1) return `${w} ${w===1?"Woche":"Wochen"} alt`;
+  return `${m} ${m===1?"Monat":"Monate"}${r>0?` und ${r} ${r===1?"Woche":"Wochen"}`:""}`;
+}
+
+function viewWoche(){
+  ITEMS=[];
+  const now=ageWeekNow(), w=state.week??clampW(now); state.week=w;
+  const ls=leapState(w), b=bandOf(w), ev=eventsOf(w), L=ls.leap;
+  const inStorm=ls.kind==="storm", done=ls.kind==="sun";
+  const start=new Date(birthDate().getTime()+w*7*DAY), end=new Date(start.getTime()+6*DAY);
+
+  const chip = inStorm?`<span class="chip storm">${ICON.storm} Sprung ${L.n}: ${L.name}</span>`
+    : done?`<span class="chip sun">${ICON.sun} Sprung ${L.n} geschafft</span>`
+    : `<span class="chip calm">${ICON.calm} Ruhigere Wochen${ls.next?` · Sprung ${ls.next.n} um Woche ${Math.max(0,Math.round(ls.next.from-offsetWeeks()))}`:""}</span>`;
+
+  const lists={
+   q1:[...(inStorm||done?L.learns.map(s=>li(s,"q1",true)):[]),...b.learns.map(s=>li(s,"q1",false))],
+   q2:[...(inStorm||done?L.games.map(s=>li(s,"q2",true)):[]),...b.play.map(s=>li(s,"q2",false))],
+   q3:[...(inStorm?L.signs.map(s=>li(s,"q3",true)):[]),...(done?[li(`Nach Sprung ${L.n} sind viele Babys fröhlicher und können sichtbar mehr|oje|sprung`,"q3",true)]:[]),...b.expect.map(s=>li(s,"q3",false))],
+   q4:b.needs.map(s=>li(s,"q4",false)),
+   q5:[...(inStorm?L.cope.map(s=>li(s,"q5",true)):[]),...b.cope.map(s=>li(s,"q5",false))],
+   q6:(b.habits||[]).map(s=>li(s,"q6",false,"gewohnheiten"))
+  };
+
+  // Auf einen Blick
+  const mood = inStorm?`Wahrscheinlich anhänglicher und unruhiger - Sprung ${L.n} „${L.name}“ läuft.`
+    : done?`Oft eine fröhlichere Phase nach Sprung ${L.n}. Es zeigt, was es Neues kann.`
+    : `Keine Sprungphase erwartet. ${esc(b.title)}.`;
+  const tipSrc = inStorm?L.cope[0]:b.cope[0]; const tip=parseItem(tipSrc);
+  const glance=`<section class="glance" aria-label="Auf einen Blick"><h2>Auf einen Blick</h2>
+   <div class="g" style="color:var(--${ls.kind})">${ICON[ls.kind]}<div style="color:var(--ink)"><b>Stimmung</b>${mood}</div></div>
+   ${ev.map(e=>`<div class="g" style="color:var(--alert)">${ICON.cal}<div style="color:var(--ink)"><b>Diese Woche</b><button class="linkbtn" data-topic="${e.topic}">${esc(e.t)}</button> - ${esc(e.d)}${tags(e.s.split(","))}</div></div>`).join("")}
+   <div class="g" style="color:var(--q5)">${ICON.tip}<div style="color:var(--ink)"><b>Tipp der Woche</b>${esc(tip.text)}</div></div>
+  </section>`;
+
+  // Wochenleiste mit Monatsmarken
+  let lastM=-1;
+  const strip=Array.from({length:MAXW+1},(_,i)=>{const k=leapState(i).kind; const m=Math.floor(i/4.345); const lab=m!==lastM?`<span class="m">${m===0?"Start":m+". Mon."}</span>`:""; lastM=m;
+    return `<button class="wk ${k}${i===now?" today":""}" data-w="${i}" aria-current="${i===w}" aria-label="Woche ${i}">${lab}<span class="n">${i}</span>${ICON[k]}</button>`}).join("");
+
+  return `
+  <section class="sky ${ls.kind}">
+    ${skyArt(ls.kind)}
+    <div class="eyebrow">Woche ${w} · ${fmtS(start)} - ${fmtS(end)}</div>
+    <h1>${ageLabel(w)}</h1>
+    <div class="band">${esc(b.title)}</div>
+    <div class="nav-row">
+      <button class="round" data-step="-1" ${w<=0?"disabled":""} aria-label="Vorige Woche">${ICON.left}</button>
+      <button class="round" data-step="1" ${w>=MAXW?"disabled":""} aria-label="Nächste Woche">${ICON.right}</button>
+      ${w!==clampW(now)?`<button class="today-btn" data-step="0">Zu heute</button>`:""}
+      ${chip}
+    </div>
+  </section>
+  <div class="strip-box" id="strip"><div class="strip hasm">${strip}</div></div>
+  <div class="legend"><span style="color:var(--storm)">${ICON.storm}</span><span>Sprungphase</span><span style="color:var(--sun)">${ICON.sun}</span><span>nach dem Sprung</span></div>
+  ${now<0?`<p class="small" style="margin:10px 0 0">Noch ${Math.ceil((parse(state.et)-today())/DAY)} Tage bis zum ET. Bis zur Geburt zeigt die App die erste Lebenswoche.</p>`:""}
+  ${glance}
+  <nav class="jump" aria-label="Zu den Fragen">${QUESTIONS.map(q=>`<button class="${q.id}" data-jump="${q.id}">${ICON[q.id]}${SHORT[q.id]}</button>`).join("")}</nav>
+  ${QUESTIONS.map(q=>`<section class="q ${q.id}" id="${q.id}"><header><span class="badge">${ICON[q.id]}</span><h2>${q.title}</h2></header><ul>${lists[q.id].join("")}</ul></section>`).join("")}
+  <section class="notebox"><h2>Unsere Notiz zu Woche ${w}</h2>
+    <label for="note" class="small" style="font-weight:600">Was war neu? Was hat beruhigt? Ein Satz reicht.</label>
+    <textarea id="note" placeholder="z. B. Hat heute gelächelt, als Papa gesungen hat.">${esc(notiz(w))}</textarea>
+    <p class="small" id="saved" aria-live="polite"></p></section>
+  <p class="note">Orientierung aus euren Quellen im Repo, keine ärztliche Beratung. Jedes Baby hat sein Tempo; bei Sorgen zählt der Kinderarzt. Das ⓘ an jedem Punkt öffnet mehr Details.</p>`;
+}
+
+function viewSpruenge(){
+  const off=offsetWeeks(), nowE=ageWeekNow()+0.5+off;
+  return `<section class="page-head"><h1>Zehn Sprünge in 20 Monaten</h1>
+  <p>Gerechnet ab eurem ET (${fmt(parse(state.et))}). Vor jedem Sprung wird das Baby anhänglicher, danach kann es etwas Neues. <button class="linkbtn" data-topic="sprung">Was sind Sprünge?</button></p></section>
+  <div class="stack">${LEAPS.map(L=>{const s=new Date(birthDate().getTime()+(L.from-off)*7*DAY),e=new Date(birthDate().getTime()+(L.to-off)*7*DAY); const isNow=nowE>=L.from&&nowE<=L.to;
+    return `<div class="card leapcard ${isNow?"now":""}"><div class="leapnum">${L.n}</div><div><h3>${L.name}${isNow?" · läuft gerade":""}</h3><div class="when">Lebenswoche ${Math.max(0,Math.round(L.from-off))}-${Math.max(0,Math.round(L.to-off))} · ${fmtS(s)} - ${fmtS(e)}</div><p style="margin:6px 0 0">${esc(parseItem(L.learns[0]).text)}</p><button class="linkbtn" data-goto="${clampW(Math.round(L.from-off))}">Diese Woche ansehen</button></div></div>`}).join("")}</div>
+  <p class="note">Die Wochen sind grobe Anhaltspunkte (±1-2 Wochen) aus „Oje, ich wachse!“.</p>`;
+}
+
+function viewNotfall(){
+  return `<section class="page-head"><h1>Notfall</h1><p>Schnell nachschauen, wann es zum Arzt oder zur 112 geht.</p></section>
+  <div class="stack">
+   <div class="card red"><h3>112 oder Klinik</h3><ul><li>schrilles, panisches Weinen, das sich nicht beruhigen lässt</li><li>trinkt gar nicht, eingefallene Fontanelle</li><li>Sturz mit Bewusstlosigkeit oder Erbrechen</li><li>apathisch oder hohes Fieber</li><li>Verdacht auf Giftiges (z. B. Tabak) - Giftnotruf</li><li>angestrengte oder geräuschvolle Atmung, bläuliche Lippen</li><li>Insektenstich in Mund oder Rachen</li></ul><p class="small">KidsDoc-Buch</p></div>
+   <div class="card"><h3>Sofort zum Kinderarzt</h3><ul><li><b>Baby unter 6 Monaten mit Fieber über 38 °C</b> (außer kurz nach Impfung)</li><li>trinkt zu wenig, auffällig wenige nasse Windeln</li><li>erbricht mehr als sonst, Durchfall</li><li>matt, teilnahmslos, ungewöhnlich weinerlich</li><li>sehr heller, entfärbter Stuhl</li><li>entzündete Haut, Quaddeln, hartnäckiger Husten</li></ul><p class="small">KidsDoc-Buch · Faustregel: lieber einmal zu viel</p></div>
+   <div class="card"><h3>Wenn ihr nicht mehr könnt</h3><ul><li>Baby sicher ins Bett legen, Raum verlassen, durchatmen, jemanden anrufen</li><li><b>Niemals schütteln</b></li><li>Schreiambulanz, kostenlose Erziehungsberatung beim Jugendamt, Hebamme</li><li>Traurigkeit, Leere oder schlimme Gedanken: sofort Hilfe holen - auch Väter</li></ul><button class="linkbtn" data-topic="ueberforderung">Mehr dazu</button></div>
+   <div class="card"><h3>Hausapotheke</h3><p style="margin:0">Digitales Fieberthermometer, Fieber- und Schmerzmittel passend fürs Alter (mit Kinderarzt), Meersalz-Nasenspray, Zinksalbe, Kühlkompresse. Erste-Hilfe-Kurs am Kind machen, Giftnotruf speichern. Keine ätherischen Öle unter 3 Jahren.</p><p class="small">KidsDoc-Buch und -Podcast</p></div>
+  </div>`;
+}
+
+function viewMehr(){
+  const list=alleNotizen().sort((a,b)=>b[0]-a[0]);
+  const topicsList=Object.entries(TOPICS).map(([k,v])=>`<button class="linkbtn" data-topic="${k}" style="display:block;margin:4px 0">${esc(v.t)}</button>`).join("");
+  return `<section class="page-head"><h1>Mehr</h1><p>Eure Daten, alle Notizen, alle Themen und die Quellen.</p></section>
+  <form class="stack" id="f"><div class="card"><h3>Eure Daten</h3><div class="row">
+   <label for="et">Errechneter Termin<input type="date" id="et" value="${state.et}" required></label>
+   <label for="birth">Geburtsdatum<input type="date" id="birth" value="${state.birth}"></label></div>
+   <p class="small">Sprünge rechnen ab dem ET, das Alter ab der Geburt. Ohne Geburtsdatum nimmt die App den ET.</p>
+   <button class="btn" type="submit">Speichern</button> <span class="small" id="ok" aria-live="polite"></span></div></form>
+  <div class="stack">
+   <div class="card"><h3>Tagebuch</h3>${list.length?list.map(([k,t])=>`<p style="margin:8px 0"><button class="linkbtn" data-goto="${k}">Woche ${k}</button><br><span style="white-space:pre-wrap">${esc(t)}</span></p>`).join(""):`<p class="small" style="margin:0">Noch keine Notizen. Schreibt sie direkt in der Wochenansicht unten.</p>`}<p class="small">${basis()?"Wird mit euren anderen Geräten abgeglichen.":"Gespeichert nur auf diesem Gerät - unten unter „Sync“ verbinden, damit ihr beide dieselben Notizen seht."}</p></div>
+   <form class="card" id="fs"><h3>Sync zwischen Geräten</h3>
+    <p class="small" style="margin:0 0 10px">Status: <b id="syncStatus" style="color:var(--ink)"></b></p>
+    <label for="db">Datenbank-URL aus Firebase<input type="url" id="db" value="${esc(cfg.db)}" placeholder="https://name-default-rtdb.europe-west1.firebasedatabase.app"></label>
+    <label for="hid" style="margin-top:10px">Code für diese App<input type="text" id="hid" value="${esc(cfg.hid)}" placeholder="mindestens 20 Zeichen" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <p style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0">
+     <button class="btn" type="submit">Speichern und verbinden</button>
+     <button class="btn btn2" type="button" data-act="code">Code erzeugen</button>
+     ${cfg.hid?`<button class="btn btn2" type="button" data-act="kopieren">Code kopieren</button>`:""}
+     ${basis()?`<button class="btn btn2" type="button" data-act="trennen">Trennen</button>`:""}</p>
+    <p class="small" id="syncOk" aria-live="polite"></p>
+    <p class="small">Erstes Handy: dieselbe Datenbank-URL wie in Brain eintragen, „Code erzeugen“, speichern. Zweites Handy: dieselbe URL und <b>denselben</b> Code eintragen, dort keinen neuen Code erzeugen. Was schon auf einem Gerät steht, wird beim Verbinden zusammengeführt, bei derselben Woche gewinnt die jüngere Fassung.</p>
+    <p class="small">Wer den Code kennt, kommt an die Notizen - also nur unter euch weitergeben.</p></form>
+   <div class="card"><h3>Alle Themen</h3>${topicsList}</div>
+   <div class="card tbl"><h3>Quellen</h3><table><thead><tr><th>Kürzel</th><th>Quelle</th><th>Datei im Repo</th></tr></thead><tbody>${Object.values(SRC).map(s=>`<tr><td><b>${s.k}</b></td><td>${esc(s.t)}</td><td class="small">${esc(s.f)}</td></tr>`).join("")}</tbody></table></div>
+  </div>
+  <p class="small version">Babywochen-Kompass ${VERSION}</p>`;
+}
+
+/* =========================================================
+   INFO-BLATT
+   ========================================================= */
+const dlg=document.getElementById("sheet"), body=document.getElementById("sheetBody");
+function openTopic(key,ctx,q){
+  const T=TOPICS[key]; if(!T) return;
+  const used=new Set(); const pts=T.pts.map(p=>{const it=parseItem(p); it.srcs.forEach(s=>used.add(s)); return `<li>${esc(it.text)}${tags(it.srcs)}</li>`}).join("");
+  body.style.setProperty("--qc", q?`var(--${q})`:"var(--muted)");
+  body.innerHTML=`<button class="close" id="closeSheet" aria-label="Schließen">×</button><div class="grip"></div>
+   <div class="kicker">${q?esc(QUESTIONS.find(x=>x.id===q).title):"Thema"}</div>
+   <h2 id="sheetTitle">${esc(T.t)}</h2>
+   ${ctx?`<div class="ctx">${esc(ctx)}</div>`:""}
+   <p class="lead">${esc(T.lead)}</p><ul>${pts}</ul>
+   <div class="srclist"><b>Quellen:</b> ${[...used].map(k=>esc(SRC[k].t)).join(" · ")}</div>`;
+  if(typeof dlg.showModal==="function") dlg.showModal(); else dlg.setAttribute("open","");
+  body.scrollTop=0;
+}
+dlg.addEventListener("click",e=>{ if(e.target===dlg||e.target.id==="closeSheet") dlg.close(); });
+
+/* =========================================================
+   STEUERUNG
+   ========================================================= */
+function render(){
+  document.querySelectorAll(".tabbar button").forEach(b=>b.removeAttribute("aria-current"));
+  const active=document.querySelector(`.tabbar button[data-tab="${state.tab}"]`); if(active) active.setAttribute("aria-current","page");
+  const v=document.getElementById("view");
+  v.innerHTML=({woche:viewWoche,spruenge:viewSpruenge,notfall:viewNotfall,mehr:viewMehr})[state.tab]();
+  if(state.tab==="woche"){
+    const cur=v.querySelector('.wk[aria-current="true"]'),box=document.getElementById("strip");
+    if(cur&&box) box.scrollLeft=cur.offsetLeft-box.clientWidth/2+cur.clientWidth/2;
+    const t=document.getElementById("note");
+    t.addEventListener("input",()=>{ setzen("notizen/w"+state.week,{t:t.value,ts:Date.now()}); document.getElementById("saved").textContent="Gespeichert"; });
+  }
+  if(state.tab==="mehr"){
+    statusZeigen();
+    document.getElementById("f").addEventListener("submit",e=>{e.preventDefault();
+      const et=document.getElementById("et").value||state.et, bi=document.getElementById("birth").value;
+      if(et!==state.et) setzen("daten/et",{v:et,ts:Date.now()});
+      if(bi!==state.birth) setzen("daten/birth",{v:bi,ts:Date.now()});
+      state.et=et; state.birth=bi; state.week=null;
+      document.getElementById("ok").textContent="Gespeichert";});
+    const fs=document.getElementById("fs"), meld=s=>{document.getElementById("syncOk").textContent=s;};
+    fs.addEventListener("submit",e=>{e.preventDefault();
+      const db=document.getElementById("db").value.trim().replace(/\/$/,""), hid=document.getElementById("hid").value.trim();
+      if(db&&!/^https:\/\//.test(db)){ meld("Die Datenbank-URL beginnt mit https://"); return; }
+      if(hid&&hid.length<20){ meld("Der Code muss mindestens 20 Zeichen haben - so verlangen es die Firebase-Regeln."); return; }
+      if(!db||!hid){ meld("Bitte Datenbank-URL und Code eintragen."); return; }
+      cfg.db=db; cfg.hid=hid; store.set("sync",cfg); versuche=0; syncState="lokal"; verbinden(); render();
+      document.getElementById("syncOk").textContent="Gespeichert, verbinde …";});
+    fs.addEventListener("click",e=>{const b=e.target.closest("[data-act]"); if(!b) return;
+      const hidEl=document.getElementById("hid");
+      if(b.dataset.act==="code"){
+        if(hidEl.value.trim()&&!confirm("Es steht schon ein Code im Feld. Wirklich einen neuen erzeugen? Das zweite Handy braucht dann auch den neuen.")) return;
+        const a="abcdefghijkmnopqrstuvwxyz23456789"; let s=""; crypto.getRandomValues(new Uint8Array(24)).forEach(x=>s+=a[x%a.length]);
+        hidEl.value=s; meld("Neuer Code - jetzt „Speichern und verbinden“ tippen.");
+      }
+      if(b.dataset.act==="kopieren"){
+        (navigator.clipboard?navigator.clipboard.writeText(cfg.hid):Promise.reject()).then(()=>meld("Code kopiert."),()=>{hidEl.select();meld("Code markiert - jetzt kopieren.");});
+      }
+      if(b.dataset.act==="trennen"){
+        if(!confirm("Sync auf diesem Gerät trennen? Die Notizen bleiben hier und in Firebase erhalten.")) return;
+        cfg.db=""; cfg.hid=""; store.set("sync",cfg); verbinden(); render();
+      }
+    });
+  }
+}
+function go(tab,week){ state.tab=tab; if(week!==undefined) state.week=week; render(); window.scrollTo(0,0); }
+document.querySelector(".tabbar").addEventListener("click",e=>{const b=e.target.closest("button"); if(b) go(b.dataset.tab);});
+document.getElementById("view").addEventListener("click",e=>{
+  const t=e.target;
+  const wk=t.closest(".wk"); if(wk){state.week=+wk.dataset.w; render(); return;}
+  const st=t.closest("[data-step]"); if(st){const s=+st.dataset.step; state.week=s===0?clampW(ageWeekNow()):clampW(state.week+s); render(); return;}
+  const inf=t.closest("[data-item]"); if(inf){const it=ITEMS[+inf.dataset.item]; openTopic(it.topic,it.text,it.q); return;}
+  const tp=t.closest("[data-topic]"); if(tp){openTopic(tp.dataset.topic); return;}
+  const gt=t.closest("[data-goto]"); if(gt){go("woche",+gt.dataset.goto); return;}
+  const jp=t.closest("[data-jump]"); if(jp){document.getElementById(jp.dataset.jump).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); return;}
+});
+document.addEventListener("keydown",e=>{ if(state.tab!=="woche"||dlg.open||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key==="ArrowLeft"){state.week=clampW(state.week-1);render();} if(e.key==="ArrowRight"){state.week=clampW(state.week+1);render();} });
+const h=location.hash.replace("#",""); if(["woche","spruenge","notfall","mehr"].includes(h)) state.tab=h;
+render();
+verbinden();
+if("serviceWorker" in navigator&&location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

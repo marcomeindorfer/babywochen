@@ -1,0 +1,17 @@
+{
+  "name": "Babywochen-Kompass",
+  "short_name": "Babywochen",
+  "description": "Woche für Woche: was das Baby lernt, Spiele, Sprünge und unsere Notizen",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f6fb",
+  "theme_color": "#3e8fd0",
+  "lang": "de",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
