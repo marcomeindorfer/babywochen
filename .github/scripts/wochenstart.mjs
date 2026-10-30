@@ -20,13 +20,15 @@ const teile = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "E
 const heute = `${teile.year}-${teile.month}-${teile.day}`, stunde = +teile.hour;
 const tage = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d) / 864e5; };
 
+// Wochenabschnitte, Sprünge und Standard-ET direkt aus der App lesen, damit nichts doppelt gepflegt wird
+const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const daten = (await holen("daten")) || {};
-const et = daten.et && daten.et.v, geburt = (daten.birth && daten.birth.v) || et;
-if (!geburt) { console.log("Kein ET und kein Geburtsdatum in Firebase."); process.exit(0); }
+// Ohne gespeicherten ET rechnet die App mit ihrem eingebauten - der Job nimmt denselben
+const et = (daten.et && daten.et.v) || (html.match(/wert\("daten\/et"\)\|\|\{\}\)\.v\|\|"(\d{4}-\d\d-\d\d)"/) || [])[1];
+const geburt = (daten.birth && daten.birth.v) || et;
+if (!geburt) { console.log("Kein ET und kein Geburtsdatum gefunden."); process.exit(0); }
 const alter = tage(heute) - tage(geburt), woche = Math.floor(alter / 7);
 
-// Wochenabschnitte und Sprünge direkt aus der App lesen, damit nichts doppelt gepflegt wird
-const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const BANDS = [...html.matchAll(/\{from:(\d+),to:(\d+),title:"([^"]+)"/g)].map(m => ({ from: +m[1], to: +m[2], title: m[3] }));
 const LEAPS = [...html.matchAll(/\{n:(\d+),name:"([^"]+)",from:([\d.]+),to:([\d.]+)/g)].map(m => ({ n: +m[1], name: m[2], from: +m[3] }));
 const MAXW = +(html.match(/MAXW=(\d+)/) || [0, 90])[1];
