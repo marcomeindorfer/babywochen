@@ -1,0 +1,43 @@
+# Erinnerung zum Wochenstart: läuft jeden Abend und schickt am ersten Tag einer neuen
+# Lebenswoche eine Push-Nachricht an alle Handys, die sie unter „Mehr“ eingeschaltet haben.
+# GitHub rechnet in UTC: 18 Uhr UTC = 20 Uhr Sommerzeit, 19 Uhr UTC = 20 Uhr Winterzeit.
+# Das Skript sendet erst ab 20 Uhr Berliner Zeit und höchstens einmal pro Tag;
+# der Lauf um 20 Uhr UTC fängt ab, falls GitHub einen Lauf ausfallen lässt.
+name: Wochenstart-Erinnerung
+on:
+  schedule:
+    - cron: "0 18 * * *"
+    - cron: "0 19 * * *"
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Testnachricht sofort an alle Geräte schicken"
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  actions: write
+concurrency: wochenstart
+jobs:
+  senden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save --no-audit --no-fund web-push@3.6.7
+      - run: node .github/scripts/wochenstart.mjs
+        env:
+          FIREBASE_DB: ${{ secrets.FIREBASE_DB }}
+          HAUSHALT_CODE: ${{ secrets.HAUSHALT_CODE }}
+          VAPID_PUBLIC: ${{ secrets.VAPID_PUBLIC }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test }}
+      # Öffentliche Repos ohne Commits schalten geplante Jobs nach 60 Tagen ab - so bleibt er an
+      - name: Job aktiv halten
+        if: always()
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/wochenstart.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}

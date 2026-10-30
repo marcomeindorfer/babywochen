@@ -879,7 +879,7 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.2";
+const VERSION="1.3";
 
 /* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
    Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
@@ -1013,6 +1013,44 @@ function syncPruefen(){ if(!basis()||syncState==="verweigert") return; flush(); 
 addEventListener("online",()=>{ versuche=0; syncPruefen(); });
 addEventListener("offline",()=>{ if(syncState==="live") zustand("getrennt"); });
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") syncPruefen(); });
+
+/* ---------- Erinnerung zum Wochenstart (Web Push) ----------
+   Jedes Gerät legt sein Abo unter haushalte/<code>/push/<geraet> ab. Ein täglicher
+   GitHub-Job (.github/workflows/wochenstart.yml) liest Geburtsdatum und Abos und schickt
+   am ersten Tag jeder Woche gegen 20 Uhr eine Nachricht an alle Geräte. */
+const VAPID_PUBLIC="BLK4XS_VKgBITOL269uPBvqNkySwA9LLqzkc2hK6BZL53MFt8eAWe_VJARpPC_UYq5fy-8jiPuVH6AlUgO8moQQ";
+const push=store.get("push",{id:"",an:false});
+const pushMoeglich=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+const b64bytes=s=>{const b=atob((s+"===".slice((s.length+3)%4)).replace(/-/g,"+").replace(/_/g,"/")); return Uint8Array.from(b,c=>c.charCodeAt(0));};
+async function pushSpeichern(sub){
+  if(!push.id){ const a=new Uint8Array(9); crypto.getRandomValues(a); push.id=[...a].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+  const r=await fetch(basis()+"/push/"+push.id+".json",{method:"PUT",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({sub:sub.toJSON(),geraet:(navigator.userAgentData&&navigator.userAgentData.platform)||navigator.platform||"",ts:Date.now()})});
+  if(!r.ok) throw new Error("Firebase "+r.status);
+  push.an=true; store.set("push",push);
+}
+async function pushEinschalten(){
+  if(await Notification.requestPermission()!=="granted") throw new Error("verweigert");
+  const reg=await navigator.serviceWorker.ready;
+  const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64bytes(VAPID_PUBLIC)});
+  await pushSpeichern(sub);
+  reg.showNotification("Erinnerung ist an",{body:"Ab jetzt kommt am ersten Tag jeder neuen Woche gegen 20 Uhr eine Nachricht.",icon:"icon-192.png",tag:"wochenstart"});
+}
+async function pushAusschalten(){
+  const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
+  if(sub) await sub.unsubscribe().catch(()=>{});
+  if(basis()&&push.id) await fetch(basis()+"/push/"+push.id+".json",{method:"DELETE"}).catch(()=>{});
+  push.an=false; store.set("push",push);
+}
+// Beim Start nachsehen, ob das Abo noch lebt, und es auffrischen (der Browser kann es erneuern)
+async function pushPruefen(){
+  if(!push.an||!pushMoeglich()||!basis()) return;
+  try{
+    const sub=await (await navigator.serviceWorker.ready).pushManager.getSubscription();
+    if(!sub||Notification.permission!=="granted"){ push.an=false; store.set("push",push); if(state.tab==="mehr") render(); return; }
+    await pushSpeichern(sub);
+  }catch(e){}
+}
 const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
 const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
 const birthDate=()=>state.birth?parse(state.birth):parse(state.et);
@@ -1186,7 +1224,15 @@ function viewMehr(){
   <div class="stack"><div class="card"><h3>Als App</h3>
    <p class="small" style="margin:0">Läuft gerade: <b style="color:var(--ink)">${alsApp()?"als installierte App":"im Browser"}</b></p>
    ${installAngebot?`<button class="btn" type="button" id="inst" style="margin-top:10px">Jetzt als App installieren</button>`
-    :alsApp()?"":`<p class="small">Chrome bietet hier gerade keine Installation an. Meist heißt das: Chrome hält die App schon für installiert. Dann in Chrome über ⋮ nach „App öffnen“ schauen.</p>`}</div></div>
+    :alsApp()?"":`<p class="small">Chrome bietet hier gerade keine Installation an. Meist heißt das: Chrome hält die App schon für installiert. Dann in Chrome über ⋮ nach „App öffnen“ schauen.</p>`}</div>
+  <div class="card"><h3>Erinnerung zum Wochenstart</h3>
+   <p class="small" style="margin:0">Am ersten Tag jeder neuen Woche kommt gegen 20 Uhr eine Nachricht auf alle eingeschalteten Handys - Zeit, die Woche gemeinsam zu lesen. Antippen öffnet gleich die neue Woche.</p>
+   ${!pushMoeglich()?`<p class="small">Dieser Browser kann keine Nachrichten empfangen. Am besten die installierte App in Chrome nehmen.</p>`
+    :!basis()?`<p class="small"><b style="color:var(--ink)">Zuerst unten den Sync verbinden</b> - die Erinnerung läuft über denselben Code.</p>`
+    :push.an&&Notification.permission==="granted"?`<p class="small">Status: <b style="color:var(--ink)">an auf diesem Gerät</b></p><button class="btn btn2" type="button" id="pushAus">Ausschalten</button>`
+    :`<button class="btn" type="button" id="pushAn" style="margin-top:10px">Auf diesem Handy einschalten</button>`}
+   <p class="small" id="pushOk" aria-live="polite"></p>
+   ${pushMoeglich()&&basis()?`<p class="small">Auf beiden Handys einschalten. Auf Xiaomi-Handys in den Einstellungen bei Chrome den Akku auf „Keine Einschränkungen“ stellen, sonst kommen Nachrichten manchmal spät.</p>`:""}</div></div>
   <form class="stack" id="f"><div class="card"><h3>Eure Daten</h3><div class="row">
    <label for="et">Errechneter Termin<input type="date" id="et" value="${state.et}" required></label>
    <label for="birth">Geburtsdatum<input type="date" id="birth" value="${state.birth}"></label></div>
@@ -1249,6 +1295,14 @@ function render(){
     statusZeigen();
     const inst=document.getElementById("inst");
     if(inst) inst.addEventListener("click",async()=>{ const e=installAngebot; if(!e) return; e.prompt(); try{ await e.userChoice; }catch(err){} installAngebot=null; render(); });
+    const pMeld=s=>{const el=document.getElementById("pushOk"); if(el) el.textContent=s;};
+    const pAn=document.getElementById("pushAn"), pAus=document.getElementById("pushAus");
+    if(pAn) pAn.addEventListener("click",async()=>{ pAn.disabled=true; pMeld("Schalte ein …");
+      try{ await pushEinschalten(); render(); }
+      catch(e){ pAn.disabled=false; pMeld(e.message==="verweigert"
+        ?"Nachrichten sind für die App blockiert. In den Handy-Einstellungen unter Apps → Chrome bzw. Babywochen → Benachrichtigungen erlauben und nochmal tippen."
+        :"Hat nicht geklappt ("+e.message+"). Ist das Handy online?"); } });
+    if(pAus) pAus.addEventListener("click",async()=>{ pAus.disabled=true; await pushAusschalten(); render(); });
     document.getElementById("f").addEventListener("submit",e=>{e.preventDefault();
       const et=document.getElementById("et").value||state.et, bi=document.getElementById("birth").value;
       if(et!==state.et) setzen("daten/et",{v:et,ts:Date.now()});
@@ -1294,8 +1348,12 @@ document.getElementById("view").addEventListener("click",e=>{
 document.addEventListener("keydown",e=>{ if(state.tab!=="woche"||dlg.open||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
   if(e.key==="ArrowLeft"){state.week=clampW(state.week-1);render();} if(e.key==="ArrowRight"){state.week=clampW(state.week+1);render();} });
 const h=location.hash.replace("#",""); if(["woche","spruenge","notfall","mehr"].includes(h)) state.tab=h;
+// Aus der Erinnerung geöffnet: ?woche=N zeigt gleich diese Woche
+const wq=new URLSearchParams(location.search).get("woche");
+if(wq!==null&&/^\d+$/.test(wq)){ state.tab="woche"; state.week=clampW(+wq); history.replaceState(null,"",location.pathname); }
 render();
 verbinden();
+pushPruefen();
 </script>
 </body>
 </html>
