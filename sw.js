@@ -1,7 +1,7 @@
 /* Service Worker: nötig für die Installation als App und damit sie auch ohne Netz startet.
    Erst Netz, dann Cache - so kommt ein Update beim nächsten Öffnen sofort an.
    Firebase (andere Adresse) läuft nie über den Cache. */
-const CACHE="babywochen-v2";
+const CACHE="babywochen-v3";
 const DATEIEN=["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>{/* Jede Datei einzeln: fehlt eine, scheitert nicht gleich die ganze Installation */
   e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(DATEIEN.map(d=>c.add(d)))).then(()=>self.skipWaiting()));});

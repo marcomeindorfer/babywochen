@@ -137,6 +137,18 @@ textarea{min-height:110px;resize:vertical}
 .card ul{margin:6px 0 0;padding-left:20px}
 .card.red{background:var(--alerts);border-color:transparent}
 .card.red h3{color:var(--alert)}
+.card ol{margin:6px 0 0;padding-left:22px}
+.card ol li{margin:3px 0}
+.callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.call{display:flex;align-items:center;gap:10px;border-radius:20px;padding:12px 14px;text-decoration:none;font-size:.85rem;font-weight:700;min-width:0}
+.call svg{width:26px;height:26px;flex:none}
+.call b{display:block;font-family:var(--display);font-size:1.35rem;line-height:1.1}
+.call.c112{background:var(--alert);color:var(--surface)}
+.call.cgift{background:var(--alerts);color:var(--alert)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tile{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:10px 12px;text-align:left;display:grid;align-content:start;gap:2px;min-width:0}
+.tile b{font-size:.95rem;line-height:1.25}
+.tile span{font-size:.78rem;color:var(--muted)}
 .leapcard{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start}
 .leapnum{width:52px;height:52px;border-radius:18px;background:var(--storms);color:var(--storm);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.4rem}
 .leapcard.now .leapnum{background:var(--storm);color:var(--surface)}
@@ -202,6 +214,7 @@ const SRC = {
   agp:{k:"AG-Podcast",t:"artgerecht-Podcast (Schreien, Pausen, Babys und Zeit, Lob, Nein)",f:"00-vorbereitung/erziehungsquellen/artgerecht-podcast-*.md"},
   kd:{k:"KidsDoc",t:"KidsDoc-Buch (Dr. Gatinho)",f:"20-elternsein/gesundheit/kidsdoc-buch.md"},
   kdp:{k:"KidsDoc-Pod",t:"KidsDoc-Podcast (Erste Hilfe, Kinderkrankheiten)",f:"20-elternsein/gesundheit/kidsdoc-podcast-*.md"},
+  eh:{k:"Erste Hilfe",t:"Erste Hilfe für Babys und Kinder (Malteser/DK)",f:"20-elternsein/gesundheit/erste-hilfe-buch-malteser.md"},
   eos:{k:"EoS",t:"Erziehen ohne Schimpfen (Schmidt)",f:"00-vorbereitung/erziehungsquellen/erziehen-ohne-schimpfen.md"},
   slow:{k:"Slow",t:"Slow Family (Dibbern/Schmidt)",f:"00-vorbereitung/erziehungsquellen/slow-family.md"},
   inb:{k:"inBindung",t:"inBindung-Podcast (Regulation statt Eskalation, Angst, Beten ist Bindung)",f:"00-vorbereitung/erziehungsquellen/inbindung-podcast-*.md"},
@@ -284,7 +297,7 @@ const TOPICS = {
   "Am sichersten ist laut Kinderarzt Prof. Jorch das eigene Bett im Elternschlafzimmer - genau eure Lösung|agb",
   "16-18 °C, Wärme im Nacken prüfen, keine Mütze im Bett, rauchfrei|kd,agb",
   "Niemals mit dem Baby auf dem Sofa einschlafen; nie im Elternbett nach Alkohol, Medikamenten oder bei extremer Erschöpfung|agb,sheet",
-  "Keine ätherischen Öle im Babyzimmer|kd"]},
+  "Keine ätherischen Öle im Babyzimmer|kd","Gitterbett: Sprossen 2,5-6 cm auseinander, Matratze ohne Spalt; Gitterstäbe raus, sobald es darüber klettert|eh"]},
  einschlafen:{t:"Wege in den Schlaf",lead:"Einschlafbegleitung ist kein Fehler, sondern altersgemäß.",pts:[
   "Wege: Ruhe, „Langeweile“ (Flur auf und ab), Bewegung, raus, loslassen, selbst runterfahren|agb",
   "Timing: müde, aber nicht übermüdet - Augen reiben, gähnen, leerer Blick, Wegdrehen|agb,kd",
@@ -397,7 +410,7 @@ const TOPICS = {
   "Putzmittel, Medikamente, giftige Pflanzen hoch oder weggeschlossen|fam,kd",
   "Nie allein auf Wickeltisch, Bett oder Sofa lassen|kd",
   "Eine Schublade mit Ungefährlichem zum Ausräumen (Tupperware, Kochlöffel, Schneebesen)|fam",
-  "„Stopp“ statt „Nein“|fam"]},
+  "„Stopp“ statt „Nein“|fam","Treppen oben und unten mit Gitter, Fenstergriffe abschließbar, keine Möbel vor Fenster|eh","Gardinen- und Rollladenschnüre hochbinden, Fernseher und Regale an der Wand befestigen|eh"]},
  fremdeln:{t:"Fremdeln",lead:"Ein wichtiger Entwicklungsschritt, kein Erziehungsthema.",pts:[
   "Meist um 8-10 Monate, endet zwischen 18 Monaten und 3 Jahren|kd,fam",
   "Oft stärker gegenüber Männern; schwächer, wenn das Kind viele Bezugspersonen hat|fam",
@@ -510,6 +523,182 @@ const TOPICS = {
   "Bedürfnisorientiert plus wenig Hilfe von außen ist oft ein Ticket in den Burn-out|agb",
   "Babysitter und Großeltern früh einbinden - weitere Bezugspersonen sind gut fürs Kind|hab,emp",
   "Jour fixe: ein fester Termin im Monat, offenes Haus, nichts muss fertig sein|slow"]},
+ /* ---------- Notfall: Erste Hilfe (Malteser-Buch, KidsDoc) ---------- */
+ notruf:{t:"Notruf 112 und die ersten Schritte",lead:"Ruhe bewahren - eure Panik überträgt sich aufs Kind. Erkennen, beurteilen, handeln.",pts:[
+  "Überblick: Was ist passiert, droht weiter Gefahr, wer kann helfen?|eh",
+  "Eigene Sicherheit zuerst: Herd, Strom, Wasser aus. Das Kind nur bewegen, wenn es dort gefährlich ist|eh",
+  "Laut um Hilfe rufen - andere wählen 112 und sichern ab, ihr bleibt beim Kind|eh",
+  "Zuerst das Lebensbedrohliche: starke Blutung, keine Atmung. Bei mehreren Kindern zuerst um das kümmern, das still daliegt|eh",
+  "112 sagen: Wo, was ist passiert, wie viele, welche Verletzungen - und auflegen erst, wenn die Leitstelle keine Fragen mehr hat|eh",
+  "Wer allein ist und das Kind atmet nicht: erst 1 Minute Wiederbelebung, dann 112 (Baby mitnehmen, Handy auf laut)|eh",
+  "Zigaretten oder Nikotin verschluckt: immer 112, nicht nur der Giftnotruf|kdp",
+  "Erste-Hilfe-Kurs am Kind machen und etwa alle 3 Monate kurz auffrischen - nichts tun ist das Schlimmste|kdp"]},
+ hlwbaby:{t:"Wiederbelebung beim Baby (bis 1 Jahr)",lead:"Bei Kindern ist fast immer die Atmung das Problem - deshalb zuerst beatmen.",pts:[
+  "Ansprechen, streicheln, an die Fußsohle tippen. Niemals schütteln|eh",
+  "Reagiert es nicht: laut Hilfe rufen. Auf eine harte Unterlage legen|eh",
+  "Sichtbares aus dem Mund holen, nie blind in den Rachen greifen|eh,kdp",
+  "Kinn mit einem Finger anheben, Kopf nur ganz leicht zurück (Schnüffelstellung, nicht überstrecken)|eh,kdp",
+  "Atmung höchstens 10 Sekunden prüfen: Brustkorb sehen, Atem hören, an der Wange fühlen|eh",
+  "Keine Atmung: 5 Beatmungen - euer Mund über Mund UND Nase, so viel Luft, dass sich der Brustkorb hebt|eh,kdp",
+  "Dann 30-mal mit 2 Fingern auf das untere Drittel des Brustbeins drücken, etwa 4 cm tief, rund 100-mal pro Minute|eh",
+  "Im Wechsel 30 drücken, 2 beatmen. Nach 1 Minute spätestens 112, dann weitermachen, bis Hilfe kommt oder es atmet|eh",
+  "Atmet es wieder: Bauch-Seitenlage (Bauch nach unten, Kopf zur Seite, etwas tiefer), Atmung laufend kontrollieren|eh"]},
+ hlwkind:{t:"Wiederbelebung beim Kind (ab 1 Jahr)",lead:"Gleicher Ablauf wie beim Baby, nur kräftiger.",pts:[
+  "Ansprechen, sanft an den Schultern rütteln. Reagiert es nicht: laut Hilfe rufen|eh",
+  "Hand auf die Stirn, Kopf nackenwärts beugen, mit der anderen Hand das Kinn anheben|eh",
+  "Atmung max. 10 Sekunden prüfen. Keine Atmung: 5 Beatmungen, Nase dabei zuhalten|eh",
+  "Handballen einer Hand auf das untere Drittel des Brustbeins, etwa 5 cm tief, 30-mal, dann 2 Beatmungen|eh",
+  "30:2 eine Minute lang, dann 112, weitermachen bis Hilfe kommt|eh",
+  "Ein Defibrillator (AED) geht auch bei Kindern - unter 8 Jahren mit Kinder-Elektroden, den Ansagen folgen|eh",
+  "Atmet es: stabile Seitenlage, alle paar Minuten Atmung prüfen|eh"]},
+ seitenlage:{t:"Seitenlage",lead:"Für bewusstlose Kinder, die atmen - damit Zunge und Erbrochenes die Atemwege nicht verlegen.",pts:[
+  "Baby: in Bauch-Seitenlage, Kopf zur Seite und etwas tiefer, Mund frei|eh",
+  "Kind: den nahen Arm angewinkelt nach oben legen|eh",
+  "Die andere Hand des Kindes an seine Wange halten, das ferne Bein anwinkeln und das Kind daran zu euch herüberziehen|eh",
+  "Oberes Bein im rechten Winkel, Kopf leicht überstrecken, Mund etwas öffnen|eh",
+  "112 rufen und bis zum Eintreffen immer wieder Atmung und Reaktion prüfen|eh",
+  "Bei Verdacht auf Rücken- oder Nackenverletzung nicht drehen, außer ihr müsst kurz weg|eh"]},
+ verschlucken:{t:"Verschluckt: Fremdkörper in den Atemwegen",lead:"Verschlucken ist nicht gleich Ersticken - kräftiges Husten ist das beste Mittel.",pts:[
+  "Hustet es kräftig, schreit oder spricht es: nur unterstützen, aufrichten, ermutigen. Nicht klopfen|kdp,eh",
+  "Wird es still, hustet schwach, bekommt keine Luft oder läuft blau an: 112|eh,kdp",
+  "Baby: bäuchlings auf euren Unterarm, Kopf tiefer, Kiefer stützen, 5 kräftige Schläge zwischen die Schulterblätter|eh,kdp",
+  "Baby: dann auf den Rücken drehen, Kopf tiefer, 5-mal mit 2 Fingern kräftig aufs Brustbein drücken. Im Wechsel wiederholen|eh,kdp",
+  "Baby nie schütteln und nicht an den Beinen kopfüber halten|eh",
+  "Kind: vornüberbeugen, 5 Rückenschläge, dann von hinten umfassen und bis zu 5-mal ruckartig in den Oberbauch drücken (Heimlich-Griff, nicht beim Baby)|eh,kdp",
+  "Nur Sichtbares aus dem Mund holen, nie blind in den Rachen greifen|eh,kdp",
+  "Wird es bewusstlos: Wiederbelebung beginnen|eh",
+  "Hochstuhl mit Fußbrett: So kann es sich beim Husten abstützen|kdp"]},
+ verschluckt:{t:"Gegenstand verschluckt",lead:"Auch Kleines und Glattes gehört ärztlich abgeklärt.",pts:[
+  "Herausfinden, was es verschluckt hat|eh",
+  "Auch kleine, glatte Gegenstände: in jedem Fall ins Krankenhaus|eh",
+  "Knopfbatterien und Magnete sind besonders gefährlich - sofort los|eh,allg",
+  "Nichts essen oder trinken lassen, vor allem bei spitzen oder großen Dingen|eh",
+  "Zigarettenkippe oder Kippenwasser: immer 112|kdp"]},
+ fieberkrampf:{t:"Fieberkrampf",lead:"Kinder unter etwa 4 Jahren können bei Fieber krampfen. Es sieht dramatisch aus, hört aber meist von selbst auf.",pts:[
+  "Zeichen: heiße Stirn, starre oder verdrehte Augen, blau anlaufendes Gesicht, steifer Rücken, zuckende Glieder, Fäuste|eh",
+  "Weich polstern, damit es sich nicht verletzt. Nicht festhalten, nichts in den Mund|eh",
+  "Bis auf die Windel ausziehen, frische Luft, lauwarm abwaschen - nicht auskühlen|eh",
+  "Danach Seitenlage, leicht zudecken, beruhigen|eh",
+  "Arzt anrufen. Atmet es nicht, dauert der Krampf über 5 Minuten oder ist es der erste: 112|eh",
+  "Uhrzeit merken - die Dauer ist für den Arzt wichtig|allg"]},
+ krampfanfall:{t:"Krampfanfall",lead:"Plötzlich bewusstlos, steif, zuckend - danach oft benommen und müde.",pts:[
+  "Umgebung freiräumen, Kopf polstern|eh",
+  "Nicht festhalten, nicht auf den Boden drücken, nichts in den Mund|eh",
+  "Nach dem Anfall: Atmung prüfen, Seitenlage, dabeibleiben|eh",
+  "112 beim ersten Anfall, wenn er über 5 Minuten dauert oder es über 10 Minuten bewusstlos ist|eh"]},
+ schreikrampf:{t:"Schreikrampf (Affektkrampf)",lead:"Bei Wut oder Schreck schreit das Kind, atmet nicht mehr aus, wird blau und steif - manchmal kurz ohnmächtig.",pts:[
+  "Kommt bei Kindern unter etwa 4 Jahren vor|eh",
+  "Ruhe bewahren, nicht schütteln - es atmet meist von selbst wieder|eh",
+  "Ins Gesicht pusten oder ein paar Tropfen Wasser können helfen|eh",
+  "Bleibt es bewusstlos: Atemwege frei, Atmung prüfen, Seitenlage, 112|eh",
+  "Beim ersten Mal dem Kinderarzt erzählen|allg"]},
+ krupp:{t:"Pseudokrupp",lead:"Meist nachts, 2-3 Tage nach einer Erkältung: bellender Husten, pfeifendes Einatmen.",pts:[
+  "Aufrecht hinsetzen, Rücken und Kopf mit Kissen stützen, ruhig reden - Angst macht es schlimmer|eh",
+  "Feuchte Luft hilft. Das Buch rät zu Dampf im Bad - Vorsicht Verbrühung; heute meist empfohlen: kühle Nachtluft am offenen Fenster|eh,allg",
+  "Arzt anrufen|eh",
+  "Zieht es beim Atmen die Haut zwischen den Rippen oder am Hals ein, wird es bläulich oder hört es nicht auf: 112|eh",
+  "Hohes Fieber, sitzt kerzengerade, sabbert, kann kaum schlucken: an Kehldeckelentzündung denken - 112|eh,allg"]},
+ allergie:{t:"Allergischer Schock",lead:"Minuten nach einem Stich, Medikament oder Lebensmittel kann eine starke Allergie lebensgefährlich werden.",pts:[
+  "Zeichen: Schwellung von Gesicht, Lippen, Hals; rote fleckige Haut; pfeifende Atmung; Angst; schneller Puls|eh",
+  "Sofort 112|eh",
+  "Hinlegen, Beine hoch. Wird die Atemnot dabei schlimmer: Oberkörper hoch|eh",
+  "Enge Kleidung an Hals und Taille lockern, beruhigen|eh",
+  "Hat das Kind ein Notfallset, sofort nach Plan anwenden|eh",
+  "Stich im Mund: Eis lutschen lassen, Arzt; bei Atemnot 112|eh",
+  "Normaler Stich: Stachel mit einer Karte seitlich herausschieben (nicht drücken), 10 Minuten kühlen|eh"]},
+ verbrennung:{t:"Verbrennung und Verbrühung",lead:"Bei Babys reicht schon eine Tasse Kaffee für eine schwere Verbrühung.",pts:[
+  "Kleine Stellen (bis Handflächengröße) sofort mit Leitungswasser kühlen, höchstens 10 Minuten|eh",
+  "Große Flächen und den Rumpf nicht kühlen - Kinder kühlen schnell aus|eh",
+  "Kleidung im Bereich vorsichtig entfernen, aufschneiden; was festklebt, bleibt dran|eh",
+  "Locker und möglichst sauber abdecken (sauberes Laken, Kissenbezug), mit Decke warmhalten|eh",
+  "Keine Salben, kein Mehl, keine Hausmittel, Blasen nicht öffnen|eh",
+  "Verbrennungen bei Kindern immer ärztlich ansehen lassen; großflächig, Gesicht, Hände oder Mund: 112|eh",
+  "Heißes getrunken: Schwellung im Rachen droht, Kleidung am Hals lockern, kaltes Wasser nippen, 112|eh",
+  "Stromunfall: erst Sicherung raus, dann anfassen. Immer zum Arzt|eh"]},
+ vergiftung:{t:"Vergiftung",lead:"Medikamente, Putzmittel, Pflanzen, Zigaretten - die häufigsten Unfälle, sobald Kinder krabbeln.",pts:[
+  "Reste aus dem Mund wischen. Kein Erbrechen auslösen, keine Milch, kein Salzwasser|eh",
+  "Brennen die Lippen: schluckweise kaltes Wasser|eh",
+  "Herausfinden was, wie viel und wann - Packung, Pflanze oder Erbrochenes mitnehmen|eh",
+  "Giftnotruf München (für Bayern): 089 19240|eh",
+  "Atemnot, Krampf, Bewusstlosigkeit oder Nikotin: sofort 112|eh,kdp",
+  "Haut verätzt: mit Handschuhen lange unter kaltem Wasser spülen, Kleidung vorsichtig ausziehen|eh",
+  "Auge verätzt: Kopf zur verletzten Seite neigen und etwa 10 Minuten spülen, das gesunde Auge schützen, Krankenhaus|eh"]},
+ sturz:{t:"Sturz und Kopfverletzung",lead:"Die meisten Stürze gehen glimpflich aus - die Warnzeichen danach sind wichtig.",pts:[
+  "Platzwunde: blutet stark, fest eine saubere Kompresse drücken, hinlegen mit Kopf leicht hoch|eh",
+  "Beule: kühlen. Beobachten, wie es sich verhält|eh",
+  "Zum Arzt: Sturz höher als das Kind selbst, mit Schwung, oder es war kurz bewusstlos|kdp,eh",
+  "112: bewusstlos, Krampf, wiederholtes Erbrechen, zunehmend müde oder verändert, klare Flüssigkeit aus Nase oder Ohr|eh,kdp",
+  "Bei Babys auch: gespannte, vorgewölbte Fontanelle|eh",
+  "Warnzeichen können noch Stunden später kommen - Erbrechen bis zu 24-48 Stunden danach ernst nehmen|kdp,eh",
+  "Verdacht auf Nacken- oder Rückenverletzung: nicht bewegen, Kopf in Linie halten, 112|eh"]},
+ blutung:{t:"Blutungen und Wunden",lead:"Fest drücken stoppt fast jede Blutung.",pts:[
+  "Starke Blutung: fest direkt auf die Wunde drücken, Körperteil hochhalten, hinlegen, 112|eh",
+  "Druckverband fest, aber nicht abschnürend; blutet es durch, ein zweites Polster drüber|eh",
+  "Steckt etwas in der Wunde: nicht herausziehen, rundherum abpolstern|eh",
+  "Schürfwunde: mit warmem Wasser säubern, Pflaster. Keine Watte, keine Salbe|eh",
+  "Nasenbluten: aufrecht sitzen, Kopf nach vorn, Nasenflügel 10 Minuten zudrücken; über 20 Minuten: Klinik|eh",
+  "Zahn ausgeschlagen: Milchzahn nicht wieder einsetzen, aber suchen; bleibender Zahn in Milch, sofort Zahnarzt|eh",
+  "Tierbiss: 5 Minuten mit Wasser und Seife spülen, Arzt|eh",
+  "Rötung, Wärme, Eiter, Fieber nach ein paar Tagen: Wundinfektion, Arzt|eh"]},
+ ertrinken:{t:"Wasser und Ertrinken",lead:"Kinder ertrinken lautlos - schon 2,5 cm Wasser reichen einem Baby.",pts:[
+  "Baby oder Kleinkind nie allein in der Wanne - zur Tür oder ans Telefon: Kind mitnehmen|eh",
+  "Planschbecken immer leeren, Regentonnen und Teiche abdecken, auch beim Nachbarn|eh",
+  "Nach einem Unfall: herausholen, nasse Sachen aus, zudecken, Atmung prüfen, ggf. Wiederbelebung|eh",
+  "Auch wenn es sich schnell erholt: immer ins Krankenhaus|eh"]},
+ schock:{t:"Schock",lead:"Nach starker Blutung oder großer Verbrennung kann der Kreislauf versagen.",pts:[
+  "Zeichen: blassgraue Haut, kalter Schweiß, schnelle flache Atmung, Unruhe, Durst|eh",
+  "112. Flach hinlegen, Beine hoch|eh",
+  "Zudecken, aber keine Wärmflasche|eh",
+  "Nichts essen oder trinken; bei Durst nur die Lippen befeuchten|eh",
+  "Nicht allein lassen, reden, beruhigen|eh"]},
+ fieber:{t:"Fieber",lead:"Ab 38 °C spricht man von Fieber. Meist ein harmloser Infekt - bei Babys zählt das Alter.",pts:[
+  "Baby unter 6 Monaten mit über 38 °C: zum Kinderarzt (außer kurz nach Impfung)|kd",
+  "Messen mit Digitalthermometer, am genauesten im Po|eh",
+  "Nicht warm einpacken, viel zu trinken anbieten (Babys: stillen bzw. Fläschchen)|eh,kd",
+  "Fiebermittel nur nach Dosierung fürs Gewicht, unter 3 Monaten nur auf ärztliche Anordnung|eh",
+  "Kühlen: lauwarm abwaschen; Arme und Beine nur, wenn sie warm sind|eh",
+  "Über 40 °C: Arzt anrufen|eh",
+  "Sofort 112 oder Klinik: apathisch, gewölbte Fontanelle, steifer Nacken, Krampf, Flecken, die unter einem Glas nicht verblassen|eh,kd"]},
+ meningitis:{t:"Hirnhautentzündung",lead:"Selten, aber gefährlich - früh erkennen ist entscheidend.",pts:[
+  "Fieber mit Teilnahmslosigkeit, Erbrechen, Trinkschwäche|eh",
+  "Bei Babys: gewölbte, gespannte Fontanelle, schrilles Schreien|eh,kd",
+  "Lichtscheu, Nackensteifigkeit, Krampf|eh",
+  "Glastest: rote oder lila Flecken, die beim Draufdrücken eines Glases nicht verblassen|eh",
+  "Dann sofort 112 oder Kinderklinik|eh"]},
+ hitze:{t:"Hitze und Kälte",lead:"Babys regulieren ihre Temperatur noch schlecht - in beide Richtungen.",pts:[
+  "Babys und kleine Kinder in der Sonne: Hut, Schatten, Kleidung|eh",
+  "Hitzeerschöpfung: kühler Ort, Beine hoch, viel trinken. Erholt es sich nicht: Hitzschlag möglich|eh",
+  "Hitzschlag: heiße, rote, trockene Haut, über 40 °C, verwirrt - ausziehen, nass abreiben, Luft zufächeln, Arzt bzw. 112|eh",
+  "Unterkühlt: rosig aussehende, aber kalte Haut, schlapp, ungewöhnlich ruhig, will nicht trinken|eh",
+  "Langsam aufwärmen: warmer Raum, Mütze, Decke, Haut an Haut. Keine Wärmflasche direkt auf die Haut. Arzt anrufen|eh"]},
+ erbrechen:{t:"Erbrechen und Durchfall",lead:"Bei Babys droht schnell Flüssigkeitsmangel.",pts:[
+  "Häufig kleine Mengen trinken lassen, gestillte Babys weiter stillen|eh,kd",
+  "Über einer Schüssel halten, Oberkörper stützen, danach Gesicht abwischen, ausruhen lassen|eh",
+  "Hält es an, wenig nasse Windeln, matt: Kinderarzt|eh,kd",
+  "Erbrechen nach einem Sturz auf den Kopf: Arzt bzw. 112|kdp"]},
+ verbandkasten:{t:"Verbandkasten und Notfallnummern",lead:"Einmal einrichten, regelmäßig prüfen.",pts:[
+  "Verbandkasten zu Hause und im Auto, Inhalt regelmäßig prüfen|eh",
+  "Hinein: Einmalhandschuhe, Rollbinden, sterile Kompressen, Augenkompressen, Pflaster in verschiedenen Größen, Dreiecktücher, Schere, Pinzette, Rettungsdecke|eh",
+  "Medikamente nicht in den Verbandkasten, sondern in einen abschließbaren Schrank|eh",
+  "Dazu: digitales Fieberthermometer, Kühlkompressen im Gefrierfach, Taschenlampe|eh",
+  "112 und Giftnotruf (089 19240) im Handy und am Kühlschrank, auch für Babysitter|eh"]},
+ sicherheit:{t:"Unfälle vorbeugen",lead:"Über die Hälfte der Unfälle passiert Kindern unter 5 Jahren zu Hause.",pts:[
+  "Wickeln: alles in Griffnähe, keinen Moment allein lassen. Am sichersten auf dem Boden|eh",
+  "Bad: Baby nie allein in der Wanne, Wassertemperatur vorher prüfen|eh",
+  "Küche: nie mit Baby auf dem Arm kochen oder Heißes trinken, Topfstiele nach innen, hintere Platten nutzen|eh",
+  "Keine Tischdecken, keine heißen Getränke, Kerzen oder Zigaretten auf niedrigen Tischen|eh",
+  "Hochstuhl stabil und immer mit Gurt, nie allein darin lassen|eh",
+  "Treppen oben und unten mit Gitter sichern, Fenster mit abschließbaren Griffen, keine Möbel davor|eh",
+  "Gardinen- und Rollladenschnüre hochbinden, Fernseher und Regale an der Wand befestigen|eh",
+  "Reiniger, Medikamente (auch Vitamintabletten), Messer wegschließen; nichts in Getränkeflaschen umfüllen|eh",
+  "Spielzeug mit Kleinteilen und Fell weg, Bänder an Kuscheltieren ab, keine Lauflernhilfe|eh",
+  "Rauchmelder in Flur, Wohn-, Schlaf- und Kinderzimmer|eh"]},
+ auto:{t:"Im Auto",lead:"Auch die kürzeste Fahrt nur im Kindersitz.",pts:[
+  "Nie auf dem Schoß und nie mit dem eigenen Gurt mitsichern|eh",
+  "Babyschale passend zum Gewicht, nach Herstelleranleitung, am besten auf der Rückbank|eh",
+  "Auf dem Beifahrersitz nur mit ausgeschaltetem Airbag|eh",
+  "Gurte eng und nicht verdreht - dicke Jacken vorher ausziehen|eh,allg",
+  "Kind nie allein im Auto lassen; Kindersicherung an, Fenster sichern|eh"]},
  essen:{t:"Essen am Familientisch",lead:"Gemeinsam essen, ohne Druck.",pts:[
   "Ab dem ersten Geburtstag Familienkost; Kuhmilch als Getränk max. ca. 300 ml|kd",
   "Regelmäßige Mahlzeiten, kein Dauersnacken|kd",
@@ -583,21 +772,21 @@ const BANDS = [
   learns:["Erkennt eure Stimmen und Mamas Geruch, sieht scharf auf etwa 20 cm|oje|sinne","Sucht selbst die Brust, wenn es auf Mamas Bauch liegt|agb|stillstart","Muss Trinken und Kacken erst lernen|kd|verdauung"],
   play:["Haut an Haut liegen, anschauen, leise reden|agb,oje|bonding|Baby nur mit Windel auf eure nackte Brust, eine Decke über euch beide. Euer Gesicht etwa 20 cm entfernt, ruhig sprechen - eure Stimmen kennt es schon aus dem Bauch.","Erste Stunde: nicht wiegen oder waschen, U1 auf dem Bauch|agb|bonding|Vorher im Kreißsaal sagen: Das Baby bleibt die erste Stunde auf Mamas Bauch, Messen und Wiegen warten, die U1 geht auf dem Bauch. Beim Kaiserschnitt Haut an Haut mit Papa."],
   expect:["Kindspech in den ersten 48 Stunden|kd|verdauung","Milcheinschuss nach 2-4 Tagen|agb|stillstart","Nachwehen, Wochenfluss und Sorgen sind normal|agb|wochenbett"],
-  needs:["Ständig Körperkontakt|agb|naehe","Stillen, wann immer es will; anfangs mindestens alle 3 Stunden|agb,kd|stillstart","Eure Ruhe und ein geschützter Raum|agb|bonding"],
+  needs:["Ständig Körperkontakt|agb|naehe","Stillen, wann immer es will; anfangs mindestens alle 3 Stunden|agb,kd|stillstart","Eure Ruhe und ein geschützter Raum|agb|bonding","Babyschale schon für die erste Fahrt nach Hause|eh|auto"],
   cope:["Papa ist die Schnittstelle nach außen|agb|papa","Beim Kaiserschnitt: Haut an Haut mit Papa, zusammenbleiben|agb|bonding","Ihr bestimmt Besuch und Nähe|oje,kd|wochenbett"],
   habits:["Abendsegen vom ersten Abend an: Hand auf Brust oder Kopf, immer derselbe kurze Satz|sheet,hab|segen","Pflege bewusst statt nebenbei: beim Wickeln sprechen, Blickkontakt, kein Handy|sheet,kd|rituale","Elterngebet an der Tür des schlafenden Babys|hab|segen"]},
  {from:1,to:3,title:"Wochenbett",
   learns:["Ahmt Gesichtsbewegungen nach, wenn ihr Zeit lasst|oje|sinne","Unterscheidet Stimmen und Situationen|oje|sinne"],
   play:["Euer Gesicht ist das spannendste Spielzeug|oje|spielen|Wenn es wach und zufrieden ist: nah ran (20-30 cm), langsam den Mund öffnen, die Zunge zeigen, lächeln - und warten. Viele Babys machen Gesichtsbewegungen nach, wenn man ihnen Zeit lässt.","Jeden Pflegeschritt ankündigen und begleiten|kd|sprache|Beim Wickeln und Anziehen erzählen, was ihr tut: „Jetzt zieh ich dir die Windel aus.“ Körperteile benennen („und jetzt der linke Arm“), Blickkontakt halten, kein Handy dabei.","Tragen und die Wohnung zeigen|oje,agb|tragen|In Tuch oder Trage (Gesicht zu euch) oder auf dem Arm durch die Wohnung gehen: an Fenster, Bild oder Pflanze stehen bleiben, benennen und Zeit zum Schauen lassen. Dreht es den Kopf weg, weitergehen oder Pause.","Kurze wache Bauchlage auf eurer Brust|kd|bauchlage|Ihr liegt halb zurückgelehnt, das Baby bäuchlings auf eurer Brust, euer Gesicht vor seinem. Anfangs 20-30 Sekunden, mehrmals am Tag, nur wenn es wach ist."],
   expect:["Will 10-12 Mal am Tag trinken und ungern abgelegt werden|agk,agb|naehe","Abends Clusterfeeding|kd,agb|cluster","Seltener Stuhl kann bei Vollgestillten normal sein|kd|verdauung"],
-  needs:["Nähe und Tragen|kd,oje|naehe","Stillen nach Bedarf, kein Wasser oder Tee|kd|stillstart","Sicherer Schlaf im Beistellbett|kd,sheet|schlafsicher"],
-  cope:["Hungerzeichen früh erkennen|agb,agk|hunger","Papa übernimmt beim Stillen den Rest|agb,sheet|papa","Nacht aufteilen, z. B. Papa 22-3 Uhr alles außer Stillen|agb|paar","Besuch bringt Essen mit|agk,kd|wochenbett","Babyblues ernst nehmen, auch bei Vätern|agb,kd|wochenbett"],
+  needs:["Nähe und Tragen|kd,oje|naehe","Stillen nach Bedarf, kein Wasser oder Tee|kd|stillstart","Sicherer Schlaf im Beistellbett|kd,sheet|schlafsicher","Nie allein auf dem Wickeltisch, auch nicht kurz|eh,kd|sicherheit"],
+  cope:["Hungerzeichen früh erkennen|agb,agk|hunger","Papa übernimmt beim Stillen den Rest|agb,sheet|papa","Nacht aufteilen, z. B. Papa 22-3 Uhr alles außer Stillen|agb|paar","Besuch bringt Essen mit|agk,kd|wochenbett","Babyblues ernst nehmen, auch bei Vätern|agb,kd|wochenbett","112 und Giftnotruf ins Handy, Erste-Hilfe-Kurs am Baby buchen|kdp,eh|notruf"],
   habits:["Begrüßungsritual nach jedem Aufwachen: Blick, ruhige Stimme, Name|sheet|rituale","Gerätefreie Stunde vor dem längsten Schlafblock, Handys schlafen am Ladeplatz außerhalb des Schlafzimmers|tw,sheet|handy","Ein Moment zu zweit am Tag, und sei es 10 Minuten Kaffee|sheet,hab|paar","Einen „Dorf“-Moment pro Woche fest einplanen|sheet,slow|dorf"]},
  {from:4,to:7,title:"Erster Monat geschafft",
   learns:["Erstes echtes Lächeln, meist um Woche 5-6|oje|sinne","Bleibt länger wach und schaut sich um|oje|sinne"],
   play:["Lächeln, Grimassen, nachmachen|oje|spielen|Lächelt es euch an, zurücklächeln und ansprechen, so merkt es, dass sein Lächeln etwas bewirkt. Grimassen langsam machen und Pausen lassen, damit es nachmachen kann. Schaut es weg, braucht es Pause.","Lieder singen statt Musik vom Band|tw,sheet|rituale|Ein festes Morgenlied, ein Schlaflied und Lieder beim Wickeln, immer dieselben. Ihr müsst nicht gut singen, das Baby liebt eure Stimme.","Babymassage, wenn es gut gelaunt ist|oje|naehe|Nur wenn es wach und zufrieden ist, gut vor dem Nachmittagstief: warmer Raum, warme Hände, Bauch sanft im Uhrzeigersinn, dann Arme und Beine. Dreht es sich weg oder weint, aufhören."],
-  expect:["Das Weinen nimmt oft bis Woche 6-8 zu, besonders abends|agb,agp|schreien","Nach ruhigen ersten Wochen werden Schlafabstände oft kürzer|agb|einschlafen"],
-  needs:["Körperkontakt bleibt das Wichtigste|sheet,agp|naehe","Tageslicht und frische Luft, abends ruhig|sheet,agb|einschlafen"],
+  expect:["Das Weinen nimmt oft bis Woche 6-8 zu, besonders abends|agb,agp|schreien","Nach ruhigen ersten Wochen werden Schlafabstände oft kürzer|agb|einschlafen","Unter 6 Monaten heißt Fieber über 38 °C: Kinderarzt|kd,eh|fieber"],
+  needs:["Körperkontakt bleibt das Wichtigste|sheet,agp|naehe","Tageslicht und frische Luft, abends ruhig|sheet,agb|einschlafen","Baden: Wasser vorher prüfen, nie allein in der Wanne|eh|ertrinken"],
   cope:["Weinen begleiten statt abstellen; Treppensteigen mit Tuch|fam|schreien","Seglertrick: nur auf 80 % fahren|agb|paar","Eigene Pause tagsüber nehmen|fam|paar"],
   habits:["Feste Abendfolge: Abwischen oder Baden, Licht dimmen, Lied, Segen|sheet,tw|rituale","Väter-Ritual: eine feste Aufgabe allein mit dem Kind, z. B. die erste Wickelrunde am Morgen|sheet,emp|papa","Täglicher Spaziergang oder Trage-Block zur ungefähr gleichen Zeit|sheet,slow|draussen","Wöchentliches Foto am gleichen Ort plus ein Satz, was neu war|sheet|rituale"]},
  {from:8,to:12,title:"Zweiter und dritter Monat",
@@ -610,50 +799,50 @@ const BANDS = [
  {from:13,to:17,title:"Vierter Monat",
   learns:["Greift gezielter, Hände und Mund erkunden alles|oje|spielen","Lacht laut, reagiert auf Stimmen|oje|sprache"],
   play:["Rassel, knisterndes Papier, Stoffbuch|oje|spielen|Dinge reichen, die es greifen, von Hand zu Hand geben und in den Mund stecken darf: Rassel, Papier zum Knistern, Stoffbuch, Spielsachen, die sanft piepsen. Nichts so Kleines, dass es verschluckt werden kann.","Spiegel und Kuckuck|oje|spielen|Kuckuck: Tuch übers Gesicht, „Wo ist …?“, und notfalls gemeinsam langsam runterziehen. Spiegel: zusammen reinschauen und das Spiegelbild ansprechen, es schaut zwischen euch und dem Spiegel hin und her.","Viel Bodenzeit statt Wippe|kd|bauchlage|Auf einer Decke am Boden liegen lassen, ein Spielzeug knapp außer Reichweite, damit es sich streckt und dreht. Wippe und Babysitz nur kurz."],
-  expect:["Sprung 4 kündigt sich oft schon ab Woche 15 an|oje|sprung","Schlaf kann wieder unruhiger werden|kd,agb|einschlafen"],
+  expect:["Sprung 4 kündigt sich oft schon ab Woche 15 an|oje|sprung","Schlaf kann wieder unruhiger werden|kd,agb|einschlafen","Greift nach allem: heiße Tassen und Kerzen weg vom Tischrand|eh|verbrennung"],
   needs:["Hilfe beim Einschlafen|agb|einschlafen","Müdigkeitszeichen ernst nehmen|kd,agb|einschlafen"],
   cope:["Kein Schlaftraining|kd,agb|schlaftraining","Bei Dauererschöpfung eine Stunde gute Beratung|fam|ueberforderung"],
   habits:["Bade-Ritual an festem Wochentag, immer gleiche Reihenfolge; Wasser langsam übers Gesicht gewöhnen|sheet,slow|rituale","Übergabe-Satz beim Gehen und Kommen: „Ich geh kurz, bin gleich wieder da.“|sheet|trennung","Parenting-Check-in bei der Date Night: Was läuft gut, was ist schwer, wobei brauchst du Hilfe?|hab|paar","Positionscheck: Ist Papa inzwischen genauso routiniert wie Mama?|emp,sheet|papa"]},
  {from:18,to:25,title:"Fünfter und sechster Monat",
   learns:["Dreht sich, stützt sich auf, interessiert sich für euer Essen|oje,kd|beikost","Versteht erste Wörter|oje|sprache"],
   play:["Alltagsgegenstände: Löffel, Becher, Dose|fam,oje|spielen|Holzlöffel, Plastikbecher, Topf mit Deckel, leere Schachteln und Eierkartons, durchsichtige Fläschchen mit etwas drin (gut verschlossen). Es darf klopfen, schütteln, ein- und ausräumen.","Bücher gemeinsam anschauen|kd|sprache|Auf den Schoß nehmen, ein Buch mit großen, klaren Bildern. Zeigen und benennen, Geräusche dazu machen, es umblättern lassen - auch Knabbern am Buch ist erlaubt.","Gemeinsam baden oder Babyschwimmen|oje|spielen|In der Wanne Schaum machen und ein Spielzeug darunter verstecken, mit einem Strohhalm in den Schaum pusten und es nachmachen lassen. Babyschwimmen: Bad mit warmem Babybecken oder festen Babyschwimmzeiten suchen."],
-  expect:["Beikost-Reifezeichen tauchen auf|kd|beikost","Es dreht sich - Wohnung wird Thema|kd,fam|kindersicher"],
-  needs:["Hochstuhl erst, wenn es sicher sitzt|kd|beikost","Allergene früh, Gluten im 5.-7. Monat|kd|allergene","Viel Nähe vor Sprung 5|oje|trennung"],
+  expect:["Beikost-Reifezeichen tauchen auf|kd|beikost","Es dreht sich - Wohnung wird Thema|kd,fam|kindersicher","Alles wandert in den Mund - Erste Hilfe beim Verschlucken kennen|eh,kdp|verschlucken"],
+  needs:["Hochstuhl erst, wenn es sicher sitzt|kd|beikost","Im Hochstuhl immer anschnallen, Fußbrett hilft beim Husten|eh,kdp|verschlucken","Allergene früh, Gluten im 5.-7. Monat|kd|allergene","Viel Nähe vor Sprung 5|oje|trennung"],
   cope:["Gläschen sind okay|kd|beikost","Nicht hinsetzen, bevor es selbst sitzt|kd,oje|bauchlage"],
   habits:["Baby sitzt bei den Mahlzeiten mit am Tisch, gleiche Zeit, gleicher Ort|hab|mahlzeit","Handys am Tisch weg, für alle|hab,tw|mahlzeit","Jeden Tag mindestens 10 Minuten Natur|slow|draussen"]},
  {from:26,to:34,title:"Sechster bis achter Monat",
   learns:["Robbt, krabbelt, sitzt - im eigenen Tempo|oje,kd|bauchlage","Ursache und Wirkung, Verschwinden und Wiederfinden|oje|trennung"],
   play:["Ausräum-Schublade mit Ungefährlichem|fam|kindersicher|Eine Schublade oder ein Schränkchen auf seiner Höhe mit Dingen füllen, die es ausräumen darf: Plastikdosen, Holzlöffel, Topflappen, Schachteln. Den Rest kindersicher machen - eine Ja-Umgebung statt Dauer-Nein.","Kartontunnel, Kissenberg, Bälle|oje|spielen|Aus Kartons und Stühlen einen Tunnel bauen, mit Kissen und Decken Hügel zum Drüberkrabbeln, ein Laken als Zelt. Dazu ein leichter Ball, der von allein rollt. Am schönsten, wenn ihr mitkrabbelt.","Draußen: Gras, Sand, Blätter|agb,slow|spielen|Auf einer Decke oder barfuß ins Gras, Sand und Wasser mit kleiner Schaufel, Blätter rascheln lassen, Tiere beobachten (Enten, Streichelzoo). Dreckig werden ist erlaubt, schon ein paar Minuten täglich zählen."],
-  expect:["Erste Zähne kommen oft um 6 Monate|kd,oje|zaehne","Trennungsangst um Woche 29 am stärksten|oje|trennung"],
-  needs:["Ab etwa 6 Monaten Fleisch im Brei|kd|beikost","Wasser aus dem Becher, sobald drei Breimahlzeiten laufen|kd|beikost"],
+  expect:["Erste Zähne kommen oft um 6 Monate|kd,oje|zaehne","Trennungsangst um Woche 29 am stärksten|oje|trennung","Erste Infekte: Fieberkrampf und Pseudokrupp erkennen|eh|fieberkrampf"],
+  needs:["Ab etwa 6 Monaten Fleisch im Brei|kd|beikost","Wasser aus dem Becher, sobald drei Breimahlzeiten laufen|kd|beikost","Kleinteile, Knopfbatterien, Kippen und Medikamente außer Reichweite|eh,kdp|vergiftung"],
   cope:["Probleme organisatorisch lösen statt Dauer-Nein|fam,kd|kindersicher","„Stopp“ statt „Nein“|fam|kindersicher"],
   habits:["Tischgebet mit Händehalten, eine Kerze anzünden|hab|mahlzeit","Ab dem ersten Zahn zweimal täglich Zähneputzen als festes Ritual|kd|zaehne","Eine feste tägliche Vorlesezeit mit Bilderbuch|hab,kd|sprache"]},
  {from:35,to:43,title:"Achter bis zehnter Monat",
   learns:["Ordnet die Welt in Gruppen, erkennt sich im Spiegel|oje|sprung","Fremdelt - ein wichtiger Schritt|kd,fam|fremdeln"],
   play:["Kurze Aufträge, Geben und Nehmen, Verstecken|oje|spielen|Etwas geben lassen („Gib das mal der Mama“) und zurückgeben, kleine Dinge holen lassen. Verstecken: erst hinter einer Zeitung oder dem Sofa, später hinter der Tür, vorher ankündigen und beim Finden schmusen.","Bilderbücher, Reime, Lieder mit Gesten|oje,kd|sprache|Auf den Schoß nehmen und „Backe, backe Kuchen“ singen: seine Händchen nehmen, bei jeder Silbe zusammenklatschen, bei „Soooo groß“ beide Arme hoch. Bilderbücher: zeigen, benennen, Geräusche machen."],
   expect:["Fremdeln, oft stärker bei Männern|kd,fam|fremdeln","Teilen gelingt noch nicht|emp,fam|grenzen"],
-  needs:["Eine sichere Basis zum Erkunden|oje,inb|naehe","Fremde nähern sich langsam|fam|fremdeln"],
+  needs:["Eine sichere Basis zum Erkunden|oje,inb|naehe","Fremde nähern sich langsam|fam|fremdeln","Treppengitter oben und unten, Schränke und Steckdosen sichern|eh|sicherheit"],
   cope:["Großeltern das Fremdeln erklären|fam|fremdeln","Kommentare gelassen nehmen|fam|umfeld"],
   habits:["Täglich eine halbe Stunde exklusiv mit dem Kind, ohne Handy - das Kind bestimmt das Spiel|fam,emp|naehe","Abschieds-Ritual beim Abgeben bei Oma oder Babysitter, mit Segen|sheet,emp|trennung","Ein Tag pro Woche gerätefrei: raus, zusammen backen, Gäste|tw|handy"]},
  {from:44,to:52,title:"Zehnter bis zwölfter Monat",
   learns:["Steht, läuft an Möbeln entlang|oje,kd|laufen","Erste Wörter um den ersten Geburtstag|kd|sprache"],
   play:["Mithelfen, Löffel selbst halten|oje|spielen|Beim Essen einen eigenen Löffel oder eine kleine Gabel geben, Brot- und Obststückchen zum Aufspießen, eine große Plastikunterlage unter den Stuhl. Beim Kochen und Aufräumen zuschauen und kleine Handgriffe machen lassen.","Lieder mit Bewegung, Klatschspiele|oje|sprache|Gegenüber sitzen, „Klatsche ohne Ende in die beiden Hände“ singen und klatschen, „Mit dem Finger klopfe dreimal auf dem Kopfe“ klopfen, zum Schluss in die Arme nehmen. Ihr macht vor, es macht nach."],
-  expect:["Will viel „selbst“ - Frust, wenn es nicht klappt|oje|grenzen","Bald Familientisch|kd|essen"],
+  expect:["Will viel „selbst“ - Frust, wenn es nicht klappt|oje|grenzen","Bald Familientisch|kd|essen","Zieht sich hoch: Tischdecken weg, Topfstiele nach innen|eh|verbrennung"],
   needs:["Anreize zum Laufen, kein Gehfrei|kd|laufen","Barfuß oder Antirutschsocken|kd|laufen"],
   cope:["Richtig wiederholen statt korrigieren|kd|sprache","Grenzen konkret und ohne Manipulation|emp,fam|grenzen"],
   habits:["Mithelfen lassen: Wäsche, Tisch decken, aufräumen - auch wenn es länger dauert|hab,oje|mithelfen","Familientisch vorbereiten: Kind isst bald mit, was ihr esst|hab,kd|mahlzeit","Nach einem Streit vor dem Kind auch vor ihm versöhnen|emp,hab|paar"]},
  {from:53,to:65,title:"Das erste Jahr ist geschafft",
   learns:["Versteht Abläufe, plant, ahmt nach|oje|spielen","Versteht viel mehr, als es sagt|kd,oje|sprache"],
   play:["Puppe baden, Geschirr spülen, Einkäufe auspacken|oje|spielen|Puppe baden: Schüssel mit lauwarmem Wasser, Waschlappen, Seife, das Handtuch erst am Schluss geben. Spülen: mit Schürze auf einem rutschfesten Stuhl an der Spüle, unzerbrechliches Geschirr, viel Schaum. Einkäufe: Empfindliches vorher wegnehmen, dann Stück für Stück reichen lassen und gemeinsam einräumen.","Viel draußen und mit anderen Kindern|slow,agb|spielen|Jeden Tag raus: Spielplatz, Wald, Wiese. Treffen mit anderen Familien fest einplanen, z. B. einen festen Termin im Monat. In diesem Alter spielen Kinder oft nebeneinander, Teilen muss noch nicht klappen."],
-  expect:["Wutanfälle aus Ohnmacht|oje,fam|wut","Bis 16 Monate laufen etwa 90 %|kd|laufen"],
+  expect:["Wutanfälle aus Ohnmacht|oje,fam|wut","Bis 16 Monate laufen etwa 90 %|kd|laufen","Stürze gehören dazu - die Warnzeichen danach kennen|eh,kdp|sturz"],
   needs:["Viele Dinge selbst entscheiden dürfen|fam|grenzen","Regelmäßige Mahlzeiten, kein Dauersnacken|kd|essen"],
   cope:["Ja-Grenze statt Erklären|fam|grenzen","Spielerisch statt Machtkampf|fam,eos|grenzen","Beim Kind bleiben, wenn ihr nur sauer seid|fam|ueberforderung"],
   habits:["Geschichte des Tages beim Abendessen: Was erlebt, was besonders, was gelernt?|slow,hab|mahlzeit","Beim Verschütten: „Das ist okay, hilfst du beim Aufwischen?“|hab|mahlzeit","Euch selbst entschuldigen, wenn ihr laut wurdet - Versöhnung vorleben|hab,emp|grenzen","Kein Fernseher als Mitte des Wohnzimmers; Bücher, Musik, Basteltisch|tw|bildschirm"]},
  {from:66,to:90,title:"Kleinkind (15 bis 20 Monate)",
   learns:["Eigener Wille, „meins“, verhandeln|oje|grenzen","Ich und du, erste Zwei-Wort-Sätze|oje,kd|sprache"],
   play:["Rollenspiele, Herumtollen, Klettern|oje|spielen|Kochen mit Töpfen und Holzlöffel, Puppe füttern und ins Bett bringen - ihr spielt mit, das Kind bestimmt. Dazu toben auf Kissen und Matratzen und klettern auf Niedriges, ihr bleibt in Reichweite.","Bücher, Reime, Lieder - keine Bildschirme|kd,tw|bildschirm|Täglich vorlesen und Bilderbücher anschauen, das Kind auch selbst erzählen lassen. Reime und Lieder mit Bewegung statt Kindersendungen."],
-  expect:["Viele Wutanfälle|fam|wut","Läuft es mit 20 Monaten nicht frei: Kinderarzt|kd|laufen"],
-  needs:["Beständig statt konsequent, logische Folgen statt Strafen|kd|grenzen","Trösten statt Ablenken|kd|naehe"],
+  expect:["Viele Wutanfälle|fam|wut","Läuft es mit 20 Monaten nicht frei: Kinderarzt|kd|laufen","Atemanhalten bei Wut (Schreikrampf) sieht schlimm aus, ist meist harmlos|eh|schreikrampf"],
+  needs:["Beständig statt konsequent, logische Folgen statt Strafen|kd|grenzen","Trösten statt Ablenken|kd|naehe","Am Wasser nie unbeaufsichtigt, Planschbecken immer leeren|eh|ertrinken"],
   cope:["Das Kind trösten, das am meisten Beruhigung braucht|fam|wut","Würden wir unseren Partner so behandeln?|fam|grenzen"],
   habits:["Abendsegen in der Augen-Version, sobald es antworten kann|hab|segen","Gutenachtgeschichte und Abendlied; Tag kurz Revue passieren lassen|emp,slow|rituale","Autofahrten ohne Bildschirm: Lied, Gespräch oder Ruhe|tw,hab|handy","Mithelfen im Haushalt als Normalfall, kein Ämtchen-Lohn|hab|mithelfen"]}
 ];
@@ -663,6 +852,14 @@ const BANDS = [
    ========================================================= */
 const EVENTS = [
  {from:0,to:0,t:"U1 und U2",d:"U1 nach der Geburt, U2 am 3.-10. Tag mit Neugeborenen- und Hörscreening.",s:"kd,allg",topic:"uterm"},
+ {from:0,to:1,t:"Notfallnummern speichern",d:"112 und Giftnotruf München 089 19240 ins Handy und an den Kühlschrank, auch für Babysitter.",s:"eh,kdp",topic:"notruf"},
+ {from:2,to:6,t:"Erste-Hilfe-Kurs am Kind",d:"Online oder vor Ort, etwa 3-5 Stunden; manche Krankenkassen zahlen dazu.",s:"kdp",topic:"hlwbaby"},
+ {from:14,to:18,t:"Wickeltisch: jetzt besonders aufpassen",d:"Es fängt an sich zu drehen - keinen Moment allein lassen, am sichersten am Boden wickeln.",s:"eh,kd",topic:"sicherheit"},
+ {from:22,to:26,t:"Vor der Beikost: Verschlucken durchgehen",d:"Einmal die Erste Hilfe beim Verschlucken lesen - Wissen nimmt die Angst.",s:"kdp,eh",topic:"verschlucken"},
+ {from:30,to:34,t:"Krabbelzeit: Gift-Check auf Bodenhöhe",d:"Reiniger, Medikamente, Kippen, Knopfbatterien und Pflanzen aufspüren und wegräumen.",s:"eh,kdp",topic:"vergiftung"},
+ {from:36,to:40,t:"Fieberkrampf und Pseudokrupp",d:"Kommen bei Infekten in diesem Alter vor - einmal lesen, wie beides aussieht.",s:"eh",topic:"fieberkrampf"},
+ {from:46,to:52,t:"Zieht sich hoch: Küche sichern",d:"Topfstiele nach innen, hintere Platten, keine Tischdecken, Ofentür wird heiß.",s:"eh",topic:"verbrennung"},
+ {from:56,to:62,t:"Läuft los: Fenster und Wasser",d:"Fenstergriffe abschließbar, keine Möbel vor Fenstern, Planschbecken und Regentonnen sichern.",s:"eh",topic:"ertrinken"},
  {from:0,to:1,t:"Vitamin D und Fluorid starten",d:"Laut KidsDoc ab der ersten Woche täglich - mit dem Kinderarzt klären.",s:"kd",topic:"vitd"},
  {from:2,to:12,t:"Stuhlfarbe im Blick",d:"Sehr heller, entfärbter Stuhl: sofort zum Kinderarzt.",s:"kd",topic:"verdauung"},
  {from:3,to:5,t:"U3 beim Kinderarzt",d:"Etwa 4.-5. Lebenswoche. U-Heft, Karte und Impfpass mitnehmen.",s:"kd,allg",topic:"uterm"},
@@ -682,7 +879,7 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.1";
+const VERSION="1.2";
 
 /* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
    Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
@@ -956,13 +1153,29 @@ function viewSpruenge(){
   <p class="note">Die Wochen sind grobe Anhaltspunkte (±1-2 Wochen) aus „Oje, ich wachse!“.</p>`;
 }
 
+/* Notfall: oben die Anrufe, dann die Wege nach „Was ist passiert?“ - jede Kachel öffnet die Schritt-für-Schritt-Anleitung (TOPICS) */
+const NOT_AKUT=[["verschlucken","Verschluckt, bekommt keine Luft"],["sturz","Sturz auf den Kopf"],["verbrennung","Verbrannt, verbrüht"],["vergiftung","Etwas Giftiges geschluckt"],["verschluckt","Gegenstand, Batterie verschluckt"],["blutung","Blutet, Wunde, Nasenbluten"],["fieberkrampf","Krampft bei Fieber"],["krampfanfall","Krampfanfall ohne Fieber"],["schreikrampf","Wird beim Schreien blau"],["krupp","Bellender Husten, pfeift"],["allergie","Schwillt an, Atemnot nach Stich oder Essen"],["ertrinken","Wasserunfall"],["schock","Blass, kalter Schweiß"],["fieber","Fieber"],["meningitis","Fieber mit Flecken, steifer Nacken"],["erbrechen","Erbrechen, Durchfall"],["hitze","Überhitzt oder unterkühlt"]];
 function viewNotfall(){
-  return `<section class="page-head"><h1>Notfall</h1><p>Schnell nachschauen, wann es zum Arzt oder zur 112 geht.</p></section>
+  const tile=([k,label])=>`<button class="tile" data-topic="${k}"><b>${esc(label)}</b>${TOPICS[k].t!==label?`<span>${esc(TOPICS[k].t)}</span>`:""}</button>`;
+  return `<section class="page-head"><h1>Notfall</h1><p>Erst anrufen, dann die Anleitung öffnen. Ersetzt keinen Erste-Hilfe-Kurs am Kind.</p></section>
+  <div class="callrow"><a class="call c112" href="tel:112"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span><b>112</b>Notruf</span></a><a class="call cgift" href="tel:+498919240"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span><b>089 19240</b>Giftnotruf München</span></a></div>
   <div class="stack">
-   <div class="card red"><h3>112 oder Klinik</h3><ul><li>schrilles, panisches Weinen, das sich nicht beruhigen lässt</li><li>trinkt gar nicht, eingefallene Fontanelle</li><li>Sturz mit Bewusstlosigkeit oder Erbrechen</li><li>apathisch oder hohes Fieber</li><li>Verdacht auf Giftiges (z. B. Tabak) - Giftnotruf</li><li>angestrengte oder geräuschvolle Atmung, bläuliche Lippen</li><li>Insektenstich in Mund oder Rachen</li></ul><p class="small">KidsDoc-Buch</p></div>
-   <div class="card"><h3>Sofort zum Kinderarzt</h3><ul><li><b>Baby unter 6 Monaten mit Fieber über 38 °C</b> (außer kurz nach Impfung)</li><li>trinkt zu wenig, auffällig wenige nasse Windeln</li><li>erbricht mehr als sonst, Durchfall</li><li>matt, teilnahmslos, ungewöhnlich weinerlich</li><li>sehr heller, entfärbter Stuhl</li><li>entzündete Haut, Quaddeln, hartnäckiger Husten</li></ul><p class="small">KidsDoc-Buch · Faustregel: lieber einmal zu viel</p></div>
+   <div class="card red"><h3>Reagiert nicht, atmet nicht?</h3><ol>
+    <li>Laut Hilfe rufen, andere wählen 112</li>
+    <li>Atemwege frei: Baby Kopf nur leicht zurück, Kind Kopf nackenwärts</li>
+    <li>Max. 10 Sekunden Atmung prüfen</li>
+    <li>Keine Atmung: <b>5-mal beatmen</b> (Baby über Mund und Nase)</li>
+    <li><b>30-mal drücken, 2-mal beatmen</b> - Baby 2 Finger, 4 cm; Kind Handballen, 5 cm</li>
+    <li>Allein: nach 1 Minute 112, dann weiter bis Hilfe kommt</li></ol>
+    <p style="margin:8px 0 0"><button class="linkbtn" data-topic="hlwbaby">Baby genau</button> · <button class="linkbtn" data-topic="hlwkind">Kind genau</button> · <button class="linkbtn" data-topic="seitenlage">Atmet es: Seitenlage</button> · <button class="linkbtn" data-topic="notruf">Was sage ich bei 112?</button></p>
+    <p class="small">Erste-Hilfe-Buch (Malteser), KidsDoc-Podcast</p></div>
+   <div class="card"><h3>Was ist passiert?</h3><div class="tiles">${NOT_AKUT.map(tile).join("")}</div></div>
+   <div class="card red"><h3>112 oder Klinik</h3><ul><li>schrilles, panisches Weinen, das sich nicht beruhigen lässt</li><li>trinkt gar nicht, eingefallene Fontanelle</li><li>Sturz mit Bewusstlosigkeit oder Erbrechen</li><li>apathisch oder hohes Fieber; gewölbte Fontanelle</li><li>Flecken, die unter einem Glas nicht verblassen</li><li>Zigarette oder Nikotin verschluckt; anderes Giftiges: Giftnotruf</li><li>angestrengte oder geräuschvolle Atmung, bläuliche Lippen</li><li>Insektenstich in Mund oder Rachen; Schwellung im Gesicht</li><li>nach einem Wasserunfall - auch wenn es wieder fit wirkt</li></ul><p class="small">KidsDoc-Buch und -Podcast, Erste-Hilfe-Buch</p></div>
+   <div class="card"><h3>Sofort zum Kinderarzt</h3><ul><li><b>Baby unter 6 Monaten mit Fieber über 38 °C</b> (außer kurz nach Impfung)</li><li>trinkt zu wenig, auffällig wenige nasse Windeln</li><li>erbricht mehr als sonst, Durchfall</li><li>matt, teilnahmslos, ungewöhnlich weinerlich</li><li>sehr heller, entfärbter Stuhl</li><li>entzündete Haut, Quaddeln, hartnäckiger Husten</li><li>jede Verbrennung, auch eine kleine</li><li>nach Sturz aus mehr als Körpergröße oder kurzer Bewusstlosigkeit</li></ul><p class="small">KidsDoc-Buch und -Podcast, Erste-Hilfe-Buch · Faustregel: lieber einmal zu viel</p></div>
    <div class="card"><h3>Wenn ihr nicht mehr könnt</h3><ul><li>Baby sicher ins Bett legen, Raum verlassen, durchatmen, jemanden anrufen</li><li><b>Niemals schütteln</b></li><li>Schreiambulanz, kostenlose Erziehungsberatung beim Jugendamt, Hebamme</li><li>Traurigkeit, Leere oder schlimme Gedanken: sofort Hilfe holen - auch Väter</li></ul><button class="linkbtn" data-topic="ueberforderung">Mehr dazu</button></div>
-   <div class="card"><h3>Hausapotheke</h3><p style="margin:0">Digitales Fieberthermometer, Fieber- und Schmerzmittel passend fürs Alter (mit Kinderarzt), Meersalz-Nasenspray, Zinksalbe, Kühlkompresse. Erste-Hilfe-Kurs am Kind machen, Giftnotruf speichern. Keine ätherischen Öle unter 3 Jahren.</p><p class="small">KidsDoc-Buch und -Podcast</p></div>
+   <div class="card"><h3>Vorbereitet sein</h3><p style="margin:0">Digitales Fieberthermometer, Fieber- und Schmerzmittel passend fürs Alter (mit Kinderarzt), Meersalz-Nasenspray, Zinksalbe, Kühlkompresse. Verbandkasten zu Hause und im Auto, Medikamente getrennt und abgeschlossen. Keine ätherischen Öle unter 3 Jahren. Erste-Hilfe-Kurs am Kind machen und alle paar Monate diese Seite durchgehen.</p>
+    <p style="margin:8px 0 0"><button class="linkbtn" data-topic="verbandkasten">Verbandkasten</button> · <button class="linkbtn" data-topic="sicherheit">Unfälle vorbeugen</button> · <button class="linkbtn" data-topic="kindersicher">Wohnung sichern</button> · <button class="linkbtn" data-topic="schlafsicher">Sicherer Schlaf</button> · <button class="linkbtn" data-topic="auto">Im Auto</button></p>
+    <p class="small">KidsDoc-Buch und -Podcast, Erste-Hilfe-Buch</p></div>
   </div>`;
 }
 
