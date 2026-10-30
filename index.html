@@ -888,7 +888,7 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.4.1";
+const VERSION="1.4.2";
 
 /* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
    Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
@@ -1067,13 +1067,15 @@ async function pushPruefen(){
    wie bei Notizen über leere Einträge. Die Wissensbasis liegt NICHT in diesem öffentlichen Repo,
    sondern in Firebase unter haushalte/<code>-wissen (hochgeladen aus dem privaten Repo elternsein
    mit ratgeber/upload-app-wissen.sh) - eigener Knoten, damit der Sync sie nicht ständig mitlädt. */
-const MODELLE=["gemini-flash-latest","gemini-flash-lite-latest"];   // 404 oder volles Kontingent: nächstes probieren
-const CHAT_REGELN=`Du bist der Eltern-Ratgeber im Babywochen-Kompass, einer App für zwei Eltern. Du antwortest auf Deutsch, freundlich, klar und praxisnah.
+// Getestet 2026-10-30 mit voller Wissensbasis (110k Tokens): 3.1-flash-lite ca. 3 s, flash-lite-latest ca. 3 s,
+// 3.5-flash ca. 15 s; gemini-flash-latest hing im Gratis-Tarif. Bei 404, vollem Kontingent oder Hänger: nächstes.
+const MODELLE=["gemini-3.1-flash-lite","gemini-flash-lite-latest","gemini-3.5-flash"];
+const CHAT_REGELN=`Du bist der Eltern-Ratgeber im Babywochen-Kompass, einer App für zwei Eltern. Du antwortest auf Deutsch, freundlich, klar und praxisnah, und sprichst die Eltern mit „ihr“ an (nicht „Sie“).
 
 Grundlage ist AUSSCHLIESSLICH die Wissensbasis unten. Sie enthält die ausgewerteten Bücher und Podcasts der Eltern (u. a. Artgerecht, Oje ich wachse, Slow Family, Erziehen ohne Schimpfen, inBindung, Habits of the Household, The Tech-Wise Family, Empower, KidsDoc, Erste Hilfe für Babys und Kinder) sowie ihre eigenen Sheets. Jeder Abschnitt beginnt mit "===== DATEI: <pfad> =====".
 
 Regeln:
-1. Beantworte Fragen nur mit Inhalten aus der Wissensbasis. Nenne die Quellen (Buch oder Podcast-Folge).
+1. Beantworte Fragen nur mit Inhalten aus der Wissensbasis. Nenne die Quellen mit Titel (Buch oder Podcast-Folge), nicht mit Dateipfad.
 2. Wenn etwas nicht in der Wissensbasis steht, sag das offen ("Dazu steht in euren Quellen nichts"). Allgemeinwissen nur, wenn du es ausdrücklich als solches kennzeichnest.
 3. Widersprechen sich Quellen, zeige beide Positionen und sag, welche Haltung laut Basissheet gewählt wurde.
 4. Grundsatz laut Basissheet: Bindung vor Korrektur, keine Strafen und keine Gewalt, Co-Regulation, Glaube als Fundament - Empfehlungen daran ausrichten.
@@ -1104,25 +1106,35 @@ function fehlerText(status,body){
 async function geminiFragen(contents,system,neu){
   let fehler=null;
   for(const m of MODELLE){
-    let r;
-    try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse`,{method:"POST",
-      headers:{"Content-Type":"application/json","x-goog-api-key":geminiKey()},
-      body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents,generationConfig:{temperature:0.3}})}); }
-    catch(e){ throw new Error("Keine Verbindung zu Google. Ist das Handy online?"); }
-    if(!r.ok){ fehler=fehlerText(r.status,await r.text().catch(()=>"")); if(r.status===404||r.status===429) continue; throw new Error(fehler); }
-    const leser=r.body.getReader(), dec=new TextDecoder(); let puffer="", irgendwas=false, grund="";
-    for(;;){
-      const {done,value}=await leser.read(); if(done) break;
-      puffer+=dec.decode(value,{stream:true});
-      const zeilen=puffer.split("\n"); puffer=zeilen.pop();
-      for(const z of zeilen){
-        if(!z.startsWith("data:")) continue;
-        let d; try{ d=JSON.parse(z.slice(5)); }catch(e){ continue; }
-        const k=d.candidates&&d.candidates[0]; if(!k) continue;
-        if(k.finishReason) grund=k.finishReason;
-        ((k.content&&k.content.parts)||[]).forEach(p=>{ if(p.text&&!p.thought){ irgendwas=true; neu(p.text); } });
+    // Wächter: kommt 40 Sekunden lang nichts (manche Modelle hängen im Gratis-Tarif), abbrechen
+    const ac=new AbortController(); let timer=null, irgendwas=false, grund="";
+    const wach=()=>{ clearTimeout(timer); timer=setTimeout(()=>ac.abort(),40000); };
+    try{
+      wach();
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse`,{method:"POST",signal:ac.signal,
+        headers:{"Content-Type":"application/json","x-goog-api-key":geminiKey()},
+        body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents,generationConfig:{temperature:0.3}})});
+      if(!r.ok){ fehler=fehlerText(r.status,await r.text().catch(()=>"")); if(r.status===404||r.status===429||r.status>=500) continue; throw new Error(fehler); }
+      const leser=r.body.getReader(), dec=new TextDecoder(); let puffer="";
+      for(;;){
+        const {done,value}=await leser.read(); if(done) break;
+        wach(); puffer+=dec.decode(value,{stream:true});
+        const zeilen=puffer.split("\n"); puffer=zeilen.pop();
+        for(const z of zeilen){
+          if(!z.startsWith("data:")) continue;
+          let d; try{ d=JSON.parse(z.slice(5)); }catch(e){ continue; }
+          const k=d.candidates&&d.candidates[0]; if(!k) continue;
+          if(k.finishReason) grund=k.finishReason;
+          ((k.content&&k.content.parts)||[]).forEach(p=>{ if(p.text&&!p.thought){ irgendwas=true; neu(p.text); } });
+        }
       }
-    }
+    }catch(e){
+      if(e.name!=="AbortError"&&e.name!=="TypeError") throw e;   // eigene Fehlermeldungen von oben durchreichen
+      // Hat das Modell schon geschrieben, nicht mit einem anderen weitermachen - sonst doppelter Text
+      if(irgendwas) throw new Error("Die Antwort ist unterwegs abgebrochen. Nochmal fragen.");
+      fehler=e.name==="AbortError"?"Google antwortet gerade nicht. Gleich nochmal versuchen.":"Keine Verbindung zu Google. Ist das Handy online?";
+      continue;
+    }finally{ clearTimeout(timer); }
     if(!irgendwas) throw new Error(grund&&grund!=="STOP"?"Google hat keine Antwort geliefert ("+grund+"). Frag bitte etwas anders.":"Keine Antwort erhalten. Nochmal versuchen.");
     return;
   }
@@ -1342,7 +1354,7 @@ function viewFragen(){
    ${liste.map(blase).join("")}
    ${laufend?`<div class="msg f">${esc(laufend.f)}</div>${laufend.fehler
      ?`<div class="msg a err"><p>${esc(laufend.fehler)}</p><button class="btn btn2" type="button" data-act="nochmal">Nochmal fragen</button></div>`
-     :`<div class="msg a" id="laufA" aria-live="polite">${laufend.a?md(laufend.a):`<p class="small" style="margin:0">Liest in euren Quellen …</p>`}</div>`}`:""}
+     :`<div class="msg a" id="laufA" aria-live="polite">${laufend.a?md(laufend.a):`<p class="small" style="margin:0">Liest in euren Quellen … (dauert ein paar Sekunden)</p>`}</div>`}`:""}
   </div>
   <form class="ask" id="fa"><label for="frage" class="sr-only" style="position:absolute;left:-9999px">Eure Frage</label><textarea id="frage" rows="1" placeholder="Eure Frage …" ${laufend&&!laufend.fehler?"disabled":""}></textarea><button class="btn" type="submit" ${laufend&&!laufend.fehler?"disabled":""}>Fragen</button></form>
   <p class="small">Keine ärztliche Beratung. Im Notfall 112, sonst Kinderarzt oder Hebamme.
