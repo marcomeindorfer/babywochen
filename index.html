@@ -166,7 +166,15 @@ th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mu
 
 /* Unten-Leiste */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
-.tabbar .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tabbar .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.chat{display:grid;gap:10px;margin-top:14px}
+.msg{border-radius:20px;padding:10px 14px;max-width:88%;overflow-wrap:anywhere}
+.msg.f{justify-self:end;background:var(--q1s);border-bottom-right-radius:6px;white-space:pre-wrap}
+.msg.a{justify-self:start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.a p{margin:0 0 8px}.msg.a p:last-child,.msg.a ul:last-child{margin-bottom:0}.msg.a ul{margin:4px 0 8px;padding-left:20px}
+.msg.err{border-color:var(--alert);color:var(--alert)}
+.ask{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));margin-top:14px;display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:8px 0}
+.ask textarea{min-height:48px;max-height:160px}
 .tabbar button{border:0;background:none;border-radius:16px;padding:6px 4px;display:grid;justify-items:center;gap:2px;font-size:.78rem;font-weight:800;color:var(--muted)}
 .tabbar svg{width:24px;height:24px}
 .tabbar button[aria-current="page"]{color:var(--ink);background:var(--q1s)}
@@ -196,6 +204,7 @@ dialog::backdrop{background:rgba(20,26,38,.45)}
 <nav class="tabbar" aria-label="Bereiche"><div class="in">
   <button data-tab="woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Woche</button>
   <button data-tab="spruenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18c3 0 3-8 6-8s3 6 6 6 3-10 6-10"/></svg>Sprünge</button>
+  <button data-tab="fragen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.6-.8 1.1v.5M12 16.5h0"/></svg>Fragen</button>
   <button data-tab="notfall" class="sos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-4.6-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.4-8 11-8 11z"/><path d="M12 9v4M10 11h4"/></svg>Notfall</button>
   <button data-tab="mehr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mehr</button>
 </div></nav>
@@ -879,7 +888,7 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.3";
+const VERSION="1.4";
 
 /* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
    Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
@@ -889,7 +898,7 @@ const alsApp=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(
 addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installAngebot=e; if(state.tab==="mehr") render(); });
 addEventListener("appinstalled",()=>{ installAngebot=null; if(state.tab==="mehr") render(); });
 
-/* Gemeinsamer Stand S: daten/et, daten/birth als {v,ts}; notizen/w<Woche> als {t,ts}.
+/* Gemeinsamer Stand S: daten/{et,birth,gemini} als {v,ts}; notizen/w<Woche> als {t,ts}; chat/<id> als {f,a,t0,ts}.
    Jeder Eintrag trägt seinen Zeitstempel, beim Abgleich gewinnt pro Eintrag der jüngere.
    Leere Notizen bleiben als {t:"",ts} stehen statt gelöscht zu werden, so kommt das
    Leeren auch auf dem anderen Gerät an und es braucht keine Grabsteine. */
@@ -948,7 +957,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{ const a=document.activ
 
 function zusammenfuehren(fern){
   fern=fern&&typeof fern==="object"?fern:{}; let neu=false;
-  ["daten","notizen"].forEach(f=>{
+  ["daten","notizen","chat"].forEach(f=>{
     const l=S[f]||{}, r=(fern[f]&&typeof fern[f]==="object")?fern[f]:{};
     new Set([...Object.keys(l),...Object.keys(r)]).forEach(k=>{
       const tl=ts(l[k]), tr=ts(r[k]);
@@ -961,7 +970,7 @@ function zusammenfuehren(fern){
 }
 function eintragRein(p,v){
   const t=p.split("/").filter(Boolean);
-  if(t.length===2&&(t[0]==="daten"||t[0]==="notizen")){
+  if(t.length===2&&(t[0]==="daten"||t[0]==="notizen"||t[0]==="chat")){
     if(v===null){ if(wert(p)){ lokalSetzen(t.join("/"),null); return true; } return false; }
     if(ts(v)>ts(wert(t.join("/")))){ lokalSetzen(t.join("/"),v); return true; }
   }else if(t.length===1&&v&&typeof v==="object"){
@@ -1050,6 +1059,106 @@ async function pushPruefen(){
     if(!sub||Notification.permission!=="granted"){ push.an=false; store.set("push",push); if(state.tab==="mehr") render(); return; }
     await pushSpeichern(sub);
   }catch(e){}
+}
+
+/* ---------- Fragen: Chat mit Google Gemini (Gratis-Tarif) über die ganze Wissensbasis ----------
+   Kein eigener Server: das Handy fragt Gemini direkt. Der Schlüssel liegt als daten/gemini im
+   Haushalt (kommt so aufs zweite Handy), der Verlauf als chat/<id> {f,a,t0,ts}, geleert wird
+   wie bei Notizen über leere Einträge. Die Wissensbasis liegt NICHT in diesem öffentlichen Repo,
+   sondern in Firebase unter haushalte/<code>-wissen (hochgeladen aus dem privaten Repo elternsein
+   mit ratgeber/upload-app-wissen.sh) - eigener Knoten, damit der Sync sie nicht ständig mitlädt. */
+const MODELLE=["gemini-flash-latest","gemini-flash-lite-latest"];   // 404 oder volles Kontingent: nächstes probieren
+const CHAT_REGELN=`Du bist der Eltern-Ratgeber im Babywochen-Kompass, einer App für zwei Eltern. Du antwortest auf Deutsch, freundlich, klar und praxisnah.
+
+Grundlage ist AUSSCHLIESSLICH die Wissensbasis unten. Sie enthält die ausgewerteten Bücher und Podcasts der Eltern (u. a. Artgerecht, Oje ich wachse, Slow Family, Erziehen ohne Schimpfen, inBindung, Habits of the Household, The Tech-Wise Family, Empower, KidsDoc, Erste Hilfe für Babys und Kinder) sowie ihre eigenen Sheets. Jeder Abschnitt beginnt mit "===== DATEI: <pfad> =====".
+
+Regeln:
+1. Beantworte Fragen nur mit Inhalten aus der Wissensbasis. Nenne die Quellen (Buch oder Podcast-Folge).
+2. Wenn etwas nicht in der Wissensbasis steht, sag das offen ("Dazu steht in euren Quellen nichts"). Allgemeinwissen nur, wenn du es ausdrücklich als solches kennzeichnest.
+3. Widersprechen sich Quellen, zeige beide Positionen und sag, welche Haltung laut Basissheet gewählt wurde.
+4. Grundsatz laut Basissheet: Bindung vor Korrektur, keine Strafen und keine Gewalt, Co-Regulation, Glaube als Fundament - Empfehlungen daran ausrichten.
+5. Medizinische Fragen: Inhalte aus den KidsDoc-Quellen und dem Erste-Hilfe-Buch wiedergeben, aber immer auf Kinderarzt, Hebamme oder 112 verweisen. Bei Warnzeichen (Fieber unter 6 Monaten, Atemnot, Bewusstlosigkeit, Vergiftungsverdacht) zuerst den Notfallhinweis nennen.
+6. Die Antwort wird auf dem Handy gelesen: zuerst die Kernaussage in ein, zwei Sätzen, dann konkrete Tipps als kurze Liste, am Ende eine Zeile "Quellen: …". Als Formatierung nur **fett** und Listen mit "- ", keine Tabellen und keine Überschriften.
+
+===== WISSENSBASIS =====
+`;
+let laufend=null;   // die gerade gestellte Frage: {id,f,a,t0,fehler}
+const geminiKey=()=>(wert("daten/gemini")||{}).v||"";
+const alleChats=()=>Object.entries(S.chat||{}).map(([id,v])=>({id,...v})).filter(c=>c.f).sort((a,b)=>a.t0-b.t0);
+async function wissenHolen(){
+  const b=cfg.db.replace(/\/$/,"")+"/haushalte/"+cfg.hid+"-wissen", c=store.get("wissen",null);
+  let stand=null;
+  try{ const r=await fetch(b+"/stand.json"); if(r.ok) stand=await r.json(); }
+  catch(e){ if(c) return c.text; throw new Error("Keine Verbindung zur Datenbank."); }
+  if(!stand){ if(c) return c.text; throw new Error("Die Wissensbasis ist für euren Code noch nicht hochgeladen."); }
+  if(c&&c.stand===stand) return c.text;
+  const text=await (await fetch(b+"/text.json")).json();
+  store.set("wissen",{stand,text}); return text;
+}
+function fehlerText(status,body){
+  if(status===429) return "Das Gratis-Kontingent bei Google ist gerade aufgebraucht. In ein, zwei Minuten nochmal versuchen - ist das Tageskontingent weg, geht es morgen wieder.";
+  if(status===400&&/API key/i.test(body)||status===401||status===403) return "Google lehnt den Gemini-Schlüssel ab. Unten unter „Schlüssel ändern“ prüfen.";
+  if(status>=500) return "Google ist gerade überlastet. Gleich nochmal versuchen.";
+  return "Google meldet Fehler "+status+".";
+}
+async function geminiFragen(contents,system,neu){
+  let fehler=null;
+  for(const m of MODELLE){
+    let r;
+    try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse`,{method:"POST",
+      headers:{"Content-Type":"application/json","x-goog-api-key":geminiKey()},
+      body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents,generationConfig:{temperature:0.3}})}); }
+    catch(e){ throw new Error("Keine Verbindung zu Google. Ist das Handy online?"); }
+    if(!r.ok){ fehler=fehlerText(r.status,await r.text().catch(()=>"")); if(r.status===404||r.status===429) continue; throw new Error(fehler); }
+    const leser=r.body.getReader(), dec=new TextDecoder(); let puffer="", irgendwas=false, grund="";
+    for(;;){
+      const {done,value}=await leser.read(); if(done) break;
+      puffer+=dec.decode(value,{stream:true});
+      const zeilen=puffer.split("\n"); puffer=zeilen.pop();
+      for(const z of zeilen){
+        if(!z.startsWith("data:")) continue;
+        let d; try{ d=JSON.parse(z.slice(5)); }catch(e){ continue; }
+        const k=d.candidates&&d.candidates[0]; if(!k) continue;
+        if(k.finishReason) grund=k.finishReason;
+        ((k.content&&k.content.parts)||[]).forEach(p=>{ if(p.text&&!p.thought){ irgendwas=true; neu(p.text); } });
+      }
+    }
+    if(!irgendwas) throw new Error(grund&&grund!=="STOP"?"Google hat keine Antwort geliefert ("+grund+"). Frag bitte etwas anders.":"Keine Antwort erhalten. Nochmal versuchen.");
+    return;
+  }
+  throw new Error(fehler||"Kein Gemini-Modell erreichbar.");
+}
+function kontext(){
+  const w=ageWeekNow();
+  return `(Hinweis der App: Heute ist der ${fmt(today())}. Errechneter Termin ${fmt(parse(state.et))}, `+
+    (state.birth?`geboren am ${fmt(parse(state.birth))}, das Baby ist in Lebenswoche ${Math.max(0,w)}.)`:`Geburtsdatum noch nicht eingetragen.)`);
+}
+async function fragen(f){
+  laufend={id:"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),f,a:"",t0:Date.now()};
+  render();
+  try{
+    const wissen=await wissenHolen();
+    const verlauf=alleChats().slice(-6).flatMap(c=>[{role:"user",parts:[{text:c.f}]},{role:"model",parts:[{text:c.a}]}]);
+    await geminiFragen([...verlauf,{role:"user",parts:[{text:kontext()+"\n\n"+f}]}],CHAT_REGELN+wissen,t=>{
+      laufend.a+=t; const el=document.getElementById("laufA"); if(el) el.innerHTML=md(laufend.a); });
+    setzen("chat/"+laufend.id,{f,a:laufend.a,t0:laufend.t0,ts:Date.now()});
+    laufend=null;
+  }catch(e){ laufend.fehler=e.message; }
+  if(state.tab==="fragen") render();
+}
+/* Mini-Markdown für die Antworten: Absätze, Listen, **fett** */
+function md(s){
+  const inl=t=>esc(t).replace(/^#{1,6}\s*/,"").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(\S(?:[^*]*?\S)?)\*/g,"<i>$1</i>");
+  let html="", liste=false, absatz=[];
+  const absatzZu=()=>{ if(absatz.length){ html+="<p>"+absatz.map(inl).join("<br>")+"</p>"; absatz=[]; } };
+  s.split("\n").forEach(z=>{
+    const li=z.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+    if(li){ absatzZu(); if(!liste){ html+="<ul>"; liste=true; } html+="<li>"+inl(li[1])+"</li>"; return; }
+    if(liste){ html+="</ul>"; liste=false; }
+    if(!z.trim()) absatzZu(); else absatz.push(z);
+  });
+  absatzZu(); if(liste) html+="</ul>";
+  return html;
 }
 const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
 const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
@@ -1217,6 +1326,29 @@ function viewNotfall(){
   </div>`;
 }
 
+function viewFragen(){
+  const kopf=`<section class="page-head"><h1>Fragen</h1><p>Fragt, was euch beschäftigt - die Antwort kommt aus euren Büchern und Podcasts, mit Quelle.</p></section>`;
+  if(!basis()) return kopf+`<div class="stack"><div class="card"><p style="margin:0">Zuerst unter <button class="linkbtn" data-tab-go="mehr">Mehr → Sync</button> verbinden. Der Chat nutzt euren Code für die Wissensbasis und den gemeinsamen Verlauf.</p></div></div>`;
+  if(!geminiKey()||state.keyAendern) return kopf+`<form class="stack" id="fk"><div class="card"><h3>Gemini-Schlüssel</h3>
+   <p class="small" style="margin:0 0 10px">Einmal auf einem Handy eintragen, das zweite bekommt ihn über den Sync. So kommt ihr kostenlos dran:</p>
+   <ol class="small"><li>Auf <b>aistudio.google.com</b> mit einem Google-Konto anmelden.</li><li>Links auf „Get API key“ und dann „API-Schlüssel erstellen“ tippen.</li><li>Den Schlüssel kopieren und hier einfügen. Keine Zahlungsdaten hinterlegen, dann bleibt es kostenlos.</li></ol>
+   <label for="gk">Schlüssel<input type="text" id="gk" value="${esc(geminiKey())}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza…"></label>
+   <p style="margin:12px 0 0"><button class="btn" type="submit">Speichern</button>${geminiKey()?` <button class="btn btn2" type="button" data-act="keyZurueck">Abbrechen</button>`:""}</p>
+   <p class="small">Gut zu wissen: Bei jeder Frage geht eure Wissensbasis mit der Frage an Google. Im Gratis-Tarif darf Google Eingaben zur Verbesserung seiner Dienste auswerten - also keine Namen oder Gesundheitsdaten eintippen, die ihr nicht teilen wollt.</p></div></form>`;
+  const liste=alleChats();
+  const blase=c=>`<div class="msg f">${esc(c.f)}</div><div class="msg a">${md(c.a)}</div>`;
+  return kopf+`<div class="chat" id="chat">
+   ${liste.length||laufend?"":`<div class="card"><p class="small" style="margin:0">Zum Beispiel: „Wie oft sollte ein Neugeborenes trinken?“, „Was hilft beim Pucken?“ oder „Wie reagieren wir auf Schreien ohne Grund?“</p></div>`}
+   ${liste.map(blase).join("")}
+   ${laufend?`<div class="msg f">${esc(laufend.f)}</div>${laufend.fehler
+     ?`<div class="msg a err"><p>${esc(laufend.fehler)}</p><button class="btn btn2" type="button" data-act="nochmal">Nochmal fragen</button></div>`
+     :`<div class="msg a" id="laufA" aria-live="polite">${laufend.a?md(laufend.a):`<p class="small" style="margin:0">Liest in euren Quellen …</p>`}</div>`}`:""}
+  </div>
+  <form class="ask" id="fa"><label for="frage" class="sr-only" style="position:absolute;left:-9999px">Eure Frage</label><textarea id="frage" rows="1" placeholder="Eure Frage …" ${laufend&&!laufend.fehler?"disabled":""}></textarea><button class="btn" type="submit" ${laufend&&!laufend.fehler?"disabled":""}>Fragen</button></form>
+  <p class="small">Keine ärztliche Beratung. Im Notfall 112, sonst Kinderarzt oder Hebamme.
+   ${liste.length?`<button class="linkbtn" data-act="leeren">Verlauf leeren</button> ·`:""} <button class="linkbtn" data-act="keyAendern">Schlüssel ändern</button></p>`;
+}
+
 function viewMehr(){
   const list=alleNotizen().sort((a,b)=>b[0]-a[0]);
   const topicsList=Object.entries(TOPICS).map(([k,v])=>`<button class="linkbtn" data-topic="${k}" style="display:block;margin:4px 0">${esc(v.t)}</button>`).join("");
@@ -1284,7 +1416,27 @@ function render(){
   document.querySelectorAll(".tabbar button").forEach(b=>b.removeAttribute("aria-current"));
   const active=document.querySelector(`.tabbar button[data-tab="${state.tab}"]`); if(active) active.setAttribute("aria-current","page");
   const v=document.getElementById("view");
-  v.innerHTML=({woche:viewWoche,spruenge:viewSpruenge,notfall:viewNotfall,mehr:viewMehr})[state.tab]();
+  v.innerHTML=({woche:viewWoche,spruenge:viewSpruenge,fragen:viewFragen,notfall:viewNotfall,mehr:viewMehr})[state.tab]();
+  if(state.tab==="fragen"){
+    const ch=document.getElementById("chat"); if(ch&&ch.lastElementChild) ch.lastElementChild.scrollIntoView({block:"end"});
+    const fk=document.getElementById("fk");
+    if(fk) fk.addEventListener("submit",e=>{ e.preventDefault(); const k=document.getElementById("gk").value.trim();
+      if(!/^[\w-]{20,}$/.test(k)){ alert("Das sieht nicht nach einem Gemini-Schlüssel aus (beginnt meist mit AIza)."); return; }
+      setzen("daten/gemini",{v:k,ts:Date.now()}); state.keyAendern=false; render(); });
+    const fa=document.getElementById("fa"), ta=document.getElementById("frage");
+    if(fa){
+      fa.addEventListener("submit",e=>{ e.preventDefault(); const f=ta.value.trim(); if(!f||(laufend&&!laufend.fehler)) return; ta.value=""; fragen(f); });
+      ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey&&matchMedia("(pointer:fine)").matches){ e.preventDefault(); fa.requestSubmit(); } });
+      ta.addEventListener("input",()=>{ ta.style.height="auto"; ta.style.height=Math.min(160,ta.scrollHeight)+"px"; });
+    }
+    v.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{ const a=b.dataset.act;
+      if(a==="nochmal"&&laufend) fragen(laufend.f);
+      if(a==="keyAendern"){ state.keyAendern=true; render(); }
+      if(a==="keyZurueck"){ state.keyAendern=false; render(); }
+      if(a==="leeren"&&confirm("Den ganzen Verlauf auf beiden Handys löschen?")){
+        alleChats().forEach(c=>setzen("chat/"+c.id,{f:"",a:"",t0:c.t0,ts:Date.now()})); laufend=null; render(); }
+    }));
+  }
   if(state.tab==="woche"){
     const cur=v.querySelector('.wk[aria-current="true"]'),box=document.getElementById("strip");
     if(cur&&box) box.scrollLeft=cur.offsetLeft-box.clientWidth/2+cur.clientWidth/2;
@@ -1343,11 +1495,12 @@ document.getElementById("view").addEventListener("click",e=>{
   const inf=t.closest("[data-item]"); if(inf){const it=ITEMS[+inf.dataset.item]; openTopic(it.topic,it.text,it.q); return;}
   const tp=t.closest("[data-topic]"); if(tp){openTopic(tp.dataset.topic); return;}
   const gt=t.closest("[data-goto]"); if(gt){go("woche",+gt.dataset.goto); return;}
+  const tg=t.closest("[data-tab-go]"); if(tg){go(tg.dataset.tabGo); return;}
   const jp=t.closest("[data-jump]"); if(jp){document.getElementById(jp.dataset.jump).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); return;}
 });
 document.addEventListener("keydown",e=>{ if(state.tab!=="woche"||dlg.open||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
   if(e.key==="ArrowLeft"){state.week=clampW(state.week-1);render();} if(e.key==="ArrowRight"){state.week=clampW(state.week+1);render();} });
-const h=location.hash.replace("#",""); if(["woche","spruenge","notfall","mehr"].includes(h)) state.tab=h;
+const h=location.hash.replace("#",""); if(["woche","spruenge","fragen","notfall","mehr"].includes(h)) state.tab=h;
 // Aus der Erinnerung geöffnet: ?woche=N zeigt gleich diese Woche
 const wq=new URLSearchParams(location.search).get("woche");
 if(wq!==null&&/^\d+$/.test(wq)){ state.tab="woche"; state.week=clampW(+wq); history.replaceState(null,"",location.pathname); }

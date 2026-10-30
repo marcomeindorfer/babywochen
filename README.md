@@ -19,3 +19,8 @@ Geburtsdatum (sonst ET) und Abos und schickt am ersten Tag jeder Lebenswoche ab 
 (einmal pro Tag, gemerkt in `push_stand`). Secrets: `FIREBASE_DB`, `HAUSHALT_CODE`, `VAPID_PUBLIC`, `VAPID_PRIVATE`.
 Der öffentliche VAPID-Schlüssel steht auch in `index.html` - nur zusammen mit dem privaten neu erzeugen,
 sonst müssen alle Handys die Erinnerung neu einschalten. Testnachricht: Actions → Wochenstart-Erinnerung → Run workflow.
+
+Fragen (Chat): Das Handy fragt Google Gemini direkt (Gratis-Tarif, Schlüssel unter `daten/gemini`,
+Verlauf unter `chat/<id>` als `{f,a,t0,ts}`). Die Wissensbasis liegt **nicht** in diesem Repo, sondern
+in Firebase unter `haushalte/<code>-wissen` (`text`, `stand`), hochgeladen aus dem privaten Repo
+`elternsein` mit `ratgeber/upload-app-wissen.sh`. Die App lädt sie nur neu, wenn sich `stand` ändert.
