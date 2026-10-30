@@ -888,7 +888,7 @@ const EVENTS = [
    ========================================================= */
 const DAY=864e5, MAXW=90;
 const store={get(k,d){try{const v=localStorage.getItem("bwk."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("bwk."+k,JSON.stringify(v))}catch(e){}}};
-const VERSION="1.4";
+const VERSION="1.4.1";
 
 /* Installation als App: Service Worker so früh wie möglich anmelden und Chromes
    Installationsangebot auffangen, damit es unter „Mehr“ als Knopf erscheint. */
@@ -1332,7 +1332,7 @@ function viewFragen(){
   if(!geminiKey()||state.keyAendern) return kopf+`<form class="stack" id="fk"><div class="card"><h3>Gemini-Schlüssel</h3>
    <p class="small" style="margin:0 0 10px">Einmal auf einem Handy eintragen, das zweite bekommt ihn über den Sync. So kommt ihr kostenlos dran:</p>
    <ol class="small"><li>Auf <b>aistudio.google.com</b> mit einem Google-Konto anmelden.</li><li>Links auf „Get API key“ und dann „API-Schlüssel erstellen“ tippen.</li><li>Den Schlüssel kopieren und hier einfügen. Keine Zahlungsdaten hinterlegen, dann bleibt es kostenlos.</li></ol>
-   <label for="gk">Schlüssel<input type="text" id="gk" value="${esc(geminiKey())}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza…"></label>
+   <label for="gk">Schlüssel<input type="text" id="gk" value="${esc(geminiKey())}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Schlüssel hier einfügen"></label>
    <p style="margin:12px 0 0"><button class="btn" type="submit">Speichern</button>${geminiKey()?` <button class="btn btn2" type="button" data-act="keyZurueck">Abbrechen</button>`:""}</p>
    <p class="small">Gut zu wissen: Bei jeder Frage geht eure Wissensbasis mit der Frage an Google. Im Gratis-Tarif darf Google Eingaben zur Verbesserung seiner Dienste auswerten - also keine Namen oder Gesundheitsdaten eintippen, die ihr nicht teilen wollt.</p></div></form>`;
   const liste=alleChats();
@@ -1421,7 +1421,8 @@ function render(){
     const ch=document.getElementById("chat"); if(ch&&ch.lastElementChild) ch.lastElementChild.scrollIntoView({block:"end"});
     const fk=document.getElementById("fk");
     if(fk) fk.addEventListener("submit",e=>{ e.preventDefault(); const k=document.getElementById("gk").value.trim();
-      if(!/^[\w-]{20,}$/.test(k)){ alert("Das sieht nicht nach einem Gemini-Schlüssel aus (beginnt meist mit AIza)."); return; }
+      // Ältere Google-Schlüssel beginnen mit AIza, neuere mit AQ. und enthalten Punkte
+      if(!/^[\w.\-]{20,}$/.test(k)){ alert("Das sieht nicht nach einem Gemini-Schlüssel aus - bitte komplett und ohne Leerzeichen einfügen."); return; }
       setzen("daten/gemini",{v:k,ts:Date.now()}); state.keyAendern=false; render(); });
     const fa=document.getElementById("fa"), ta=document.getElementById("frage");
     if(fa){
